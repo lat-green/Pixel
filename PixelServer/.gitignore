@@ -1,0 +1,10 @@
+
+**/target/**
+
+!**/src/**/target/
+
+**/src/**/resources/application-secret.properties
+
+### IntelliJ IDEA ###
+**/.idea/**
+*.iml
