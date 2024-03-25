@@ -1,50 +1,65 @@
 import React from 'react';
-import "./App.css"
-import {BrowserRouter as Router, Link, Route, Routes, useSearchParams} from "react-router-dom";
+import {Link, Route, Routes, useSearchParams} from "react-router-dom";
+import {getTokens} from "./api/ServerAuthUtil";
+import {AnonymousOnly, AuthorizationOnly, UserMeInfo} from "./components/user/User";
+import {Paper, styled} from "@mui/material";
+import {Chat} from "./components/Chat";
+import {Contacts} from "./components/Contacts";
+
+const Item = styled(Paper)(({theme}) => ({
+    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+    ...theme.typography.body2,
+    padding: theme.spacing(1),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+}));
 
 function Home() {
     return <>
         <header>
-            {/*<Link to="/">Home</Link>*/}
-            <Link to="/auth/signin">SignIn</Link>
-            {/*<Link to="/auth/signup">SignUp</Link>*/}
+            <UserMeInfo>
+                <ul>
+                    <li><Link to="/">Home</Link></li>
+                    <AnonymousOnly>
+                        <li><Link to="/auth/signin">SignIn</Link></li>
+                        <li><Link to="/auth/signup">SignUp</Link></li>
+                    </AnonymousOnly>
+                    <AuthorizationOnly>
+                        <li><Link to="/auth/logout">LogOut</Link></li>
+                    </AuthorizationOnly>
+                </ul>
+                <AuthorizationOnly>
+                    <Contacts/>
+                </AuthorizationOnly>
+            </UserMeInfo>
         </header>
     </>
 }
 
 function AuthSignIn(): JSX.Element | null {
-    console.log("a")
     window.location.href = "http://localhost:7777/oauth2/authorize?response_type=code&client_id=test-client&redirect_uri=http://localhost:3000/auth/code&scope=read write"
     return null
 }
 
-interface Tokens {
-    access_token: string,
-    refresh_token: string,
-    token_type: string,
+function AuthSignUp(): JSX.Element | null {
+    window.location.href = "http://localhost:7777/oauth2/registration?response_type=code&client_id=test-client&redirect_uri=http://localhost:3000/auth/code&scope=read write"
+    return null
 }
 
-async function getTokens(code: string): Promise<Tokens> {
-    'use server';
-
-    console.log("server")
-
-    return fetch(`http://localhost:7777/oauth2/token?grant_type=authorization_code&code=${code}&redirect_uri=http://localhost:3000/auth/code`, {
-        method: 'POST',
-        headers: {
-            'Authorization': "Basic dGVzdC1jbGllbnQ6dGVzdC1jbGllbnQ="
-        }
-    }).then(resp => resp.json());
+function AuthLogOut(): JSX.Element | null {
+    sessionStorage.removeItem("access_token")
+    window.location.href = "/"
+    return null
 }
 
 function AuthCode(): JSX.Element | null {
     const [params, _] = useSearchParams()
     const code = params.get('code')!!
 
-    getTokens(code).then(json => {
-        const access_token = json.access_token
+    getTokens(code).then(tokens => {
+        const access_token = tokens.access_token
         if (access_token)
-            sessionStorage.setItem('access_token', json.access_token)
+            sessionStorage.setItem('access_token', tokens.access_token)
         window.location.href = '/';
     })
     return null
@@ -52,12 +67,13 @@ function AuthCode(): JSX.Element | null {
 
 export default function App() {
     return (
-        <Router>
-            <Routes>
-                <Route path="/auth/code" element={<AuthCode/>}/>
-                <Route path="/auth/signin" element={<AuthSignIn/>}/>
-                <Route path="/" element={<Home/>}/>
-            </Routes>
-        </Router>
+        <Routes>
+            <Route path="/auth/code" element={<AuthCode/>}/>
+            <Route path="/auth/signin" element={<AuthSignIn/>}/>
+            <Route path="/auth/signup" element={<AuthSignUp/>}/>
+            <Route path="/auth/logout" element={<AuthLogOut/>}/>
+            <Route path="/" element={<Home/>}/>
+            <Route path="/chat/:id" element={<Chat/>}/>
+        </Routes>
     );
 }

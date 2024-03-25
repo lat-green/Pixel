@@ -1,6 +1,9 @@
+import React from "react";
 import {Chat, User} from "../api/Data";
+import {Link} from "react-router-dom";
 
-export function Chats() {
+
+export function Contacts() {
     let chats: Chat[] = []
     chats.push({
         user: {
@@ -14,19 +17,24 @@ export function Chats() {
             username: "Maksim"
         }
     })
+    
     return (
-        <>
+        <ul>
             {
-                chats.map(({user}) => ChatComponent({user}))
+                chats.map(({user}) => (
+                    ChatComponent({user})
+                ))
             }
-        </>
+        </ul>
     )
 }
 
 function ChatComponent({user}: { user: User }) {
     return (
-        <>
-            {user.username}
-        </>
+        <li>
+            <Link to={`/chat/${user.id}`}>
+                {user.username}
+            </Link>
+        </li>
     )
 }
