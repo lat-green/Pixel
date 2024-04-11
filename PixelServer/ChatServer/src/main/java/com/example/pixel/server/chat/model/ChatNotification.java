@@ -1,4 +1,4 @@
-package com.example.pixel.server.chat.entity;
+package com.example.pixel.server.chat.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class ChatNotification {
 
     private Long id;
-    private String senderId;
+    private Long senderId;
     private String senderName;
 
 }

@@ -1,20 +1,20 @@
 package com.example.pixel.server.chat.service;
 
-import com.example.pixel.server.chat.entity.ChatRoom;
+import com.example.pixel.server.chat.model.ChatRoom;
 import com.example.pixel.server.chat.repository.ChatRoomRepository;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@AllArgsConstructor
 @Service
 public class ChatRoomService {
 
-    private final ChatRoomRepository chatRoomRepository;
+    @Autowired
+    private ChatRoomRepository chatRoomRepository;
 
     public Optional<String> getChatId(
-            String senderId, String recipientId, boolean createIfNotExist) {
+            Long senderId, Long recipientId, boolean createIfNotExist) {
         return chatRoomRepository
                 .findBySenderIdAndRecipientId(senderId, recipientId)
                 .map(ChatRoom::getChatId)
@@ -22,8 +22,7 @@ public class ChatRoomService {
                     if (!createIfNotExist) {
                         return Optional.empty();
                     }
-                    var chatId =
-                            String.format("%s_%s", senderId, recipientId);
+                    var chatId = senderId + "_" + recipientId;
                     ChatRoom senderRecipient = ChatRoom
                             .builder()
                             .chatId(chatId)

@@ -1,6 +1,7 @@
-package com.example.pixel.server.chat.entity;
+package com.example.pixel.server.chat.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,14 +18,21 @@ import java.util.Date;
 public class ChatMessage {
 
     @Id
+    @GeneratedValue
     private Long id;
+
     private String chatId;
-    private String senderId;
-    private String recipientId;
+
+    private Long senderId;
+    private Long recipientId;
+
     private String senderName;
     private String recipientName;
+
     private String content;
+
     private Date timestamp;
+
     private MessageStatus status;
 
 }

@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -32,12 +33,6 @@ public class User implements UserDetails, BaseEntity {
     private String password;
 
     @JsonIgnore
-    @JsonSerialize(using = EntityAsIdOnlySerializer.class)
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
-    private Collection<Application> applications;
-
-    @JsonIgnore
-    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
     }

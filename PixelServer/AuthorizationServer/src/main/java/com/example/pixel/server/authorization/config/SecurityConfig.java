@@ -1,7 +1,7 @@
 package com.example.pixel.server.authorization.config;
 
-import com.example.pixel.server.authorization.entity.User;
 import com.example.pixel.server.authorization.controller.FilterChainExceptionHandler;
+import com.example.pixel.server.authorization.entity.User;
 import com.example.pixel.server.authorization.security.BearerOAuth2TokenAuthenticationFilter;
 import com.example.pixel.server.authorization.security.BearerTokenAuthenticationProvider;
 import com.example.pixel.server.authorization.security.UserServiceAuthenticationProvider;
@@ -21,8 +21,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerExceptionResolver;
-
-import java.util.List;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -48,7 +46,6 @@ public class SecurityConfig {
                                 .builder()
                                 .id(-1)
                                 .username("anonymous")
-                                .applications(List.of())
                                 .build()
                 ))
 //                .httpBasic(AbstractHttpConfigurer::disable)

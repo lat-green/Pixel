@@ -1,27 +1,35 @@
-import React from "react";
-import {Chat, User} from "../api/Data";
+import React, {DependencyList, useEffect, useState} from "react";
+import {getAllUsers, User} from "../api/Data";
 import {Link} from "react-router-dom";
+import {useUser} from "./user/User";
 
+function useFetch<T>(func: () => Promise<T>, deps?: DependencyList): T | undefined {
+    const [result, setResult] = useState<T>()
+
+    useEffect(() => {
+        func().then(result => {
+            setResult(result)
+        })
+    }, deps);
+
+    return result
+}
 
 export function Contacts() {
-    let chats: Chat[] = []
-    chats.push({
-        user: {
-            id: 45,
-            username: "Nikita"
-        }
-    })
-    chats.push({
-        user: {
-            id: 45,
-            username: "Maksim"
-        }
-    })
-    
+    const me = useUser()
+    const chats = useFetch(getAllUsers, [])
+
+    if (!chats)
+        return (
+            <>
+                Loading ...
+            </>
+        )
+
     return (
         <ul>
             {
-                chats.map(({user}) => (
+                chats.filter(user => user.id !== me.id).map((user) => (
                     ChatComponent({user})
                 ))
             }

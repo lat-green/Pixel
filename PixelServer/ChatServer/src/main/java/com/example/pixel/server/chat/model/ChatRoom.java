@@ -1,6 +1,7 @@
-package com.example.pixel.server.chat.entity;
+package com.example.pixel.server.chat.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,9 +16,10 @@ import lombok.NoArgsConstructor;
 public class ChatRoom {
 
     @Id
+    @GeneratedValue
     private Long id;
     private String chatId;
-    private String senderId;
-    private String recipientId;
+    private Long senderId;
+    private Long recipientId;
 
 }

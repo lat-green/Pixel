@@ -1,10 +1,11 @@
 import React from 'react';
 import {Link, Route, Routes, useSearchParams} from "react-router-dom";
 import {getTokens} from "./api/ServerAuthUtil";
-import {AnonymousOnly, AuthorizationOnly, UserMeInfo} from "./components/user/User";
+import {AnonymousOnly, AuthorizationOnly, UserMeInfo, UserName} from "./components/user/User";
 import {Paper, styled} from "@mui/material";
-import {Chat} from "./components/Chat";
 import {Contacts} from "./components/Contacts";
+import Chat from "./components/Chat";
+import {AUTH_URI, SERVER_IP} from "./api/DataUtil";
 
 const Item = styled(Paper)(({theme}) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -17,32 +18,31 @@ const Item = styled(Paper)(({theme}) => ({
 function Home() {
     return <>
         <header>
-            <UserMeInfo>
-                <ul>
-                    <li><Link to="/">Home</Link></li>
-                    <AnonymousOnly>
-                        <li><Link to="/auth/signin">SignIn</Link></li>
-                        <li><Link to="/auth/signup">SignUp</Link></li>
-                    </AnonymousOnly>
-                    <AuthorizationOnly>
-                        <li><Link to="/auth/logout">LogOut</Link></li>
-                    </AuthorizationOnly>
-                </ul>
+            <ul>
+                <li><Link to="/">Home</Link></li>
+                <AnonymousOnly>
+                    <li><Link to="/auth/signin">SignIn</Link></li>
+                    <li><Link to="/auth/signup">SignUp</Link></li>
+                </AnonymousOnly>
                 <AuthorizationOnly>
-                    <Contacts/>
+                    Hello, <UserName/>.
+                    <li><Link to="/auth/logout">LogOut</Link></li>
                 </AuthorizationOnly>
-            </UserMeInfo>
+            </ul>
+            <AuthorizationOnly>
+                <Contacts/>
+            </AuthorizationOnly>
         </header>
     </>
 }
 
 function AuthSignIn(): JSX.Element | null {
-    window.location.href = "http://localhost:7777/oauth2/authorize?response_type=code&client_id=test-client&redirect_uri=http://localhost:3000/auth/code&scope=read write"
+    window.location.href = `${AUTH_URI}/oauth2/authorize?response_type=code&client_id=test-client&redirect_uri=http://${SERVER_IP}:3000/auth/code&scope=read write`
     return null
 }
 
 function AuthSignUp(): JSX.Element | null {
-    window.location.href = "http://localhost:7777/oauth2/registration?response_type=code&client_id=test-client&redirect_uri=http://localhost:3000/auth/code&scope=read write"
+    window.location.href = `${AUTH_URI}/oauth2/registration?response_type=code&client_id=test-client&redirect_uri=http://${SERVER_IP}:3000/auth/code&scope=read write`
     return null
 }
 
@@ -72,8 +72,8 @@ export default function App() {
             <Route path="/auth/signin" element={<AuthSignIn/>}/>
             <Route path="/auth/signup" element={<AuthSignUp/>}/>
             <Route path="/auth/logout" element={<AuthLogOut/>}/>
-            <Route path="/" element={<Home/>}/>
-            <Route path="/chat/:id" element={<Chat/>}/>
+            <Route path="/" element={<UserMeInfo><Home/></UserMeInfo>}/>
+            <Route path="/chat/:id" element={<UserMeInfo><Chat/></UserMeInfo>}/>
         </Routes>
     );
 }

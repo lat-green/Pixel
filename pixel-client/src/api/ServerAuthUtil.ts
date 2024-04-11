@@ -1,6 +1,6 @@
 'use server'
 
-export const AUTH_URL = 'http://localhost:7777'
+import {AUTH_URI, SERVER_IP} from "./DataUtil";
 
 interface Tokens {
     access_token: string,
@@ -10,7 +10,7 @@ interface Tokens {
 
 export async function getTokens(code: string): Promise<Tokens> {
 
-    return fetch(`${AUTH_URL}/oauth2/token?grant_type=authorization_code&code=${code}&redirect_uri=http://localhost:3000/auth/code`, {
+    return fetch(`${AUTH_URI}/oauth2/token?grant_type=authorization_code&code=${code}&redirect_uri=http://${SERVER_IP}:3000/auth/code`, {
         method: 'POST',
         headers: {
             'Authorization': "Basic dGVzdC1jbGllbnQ6dGVzdC1jbGllbnQ="

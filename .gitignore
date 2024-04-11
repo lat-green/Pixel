@@ -2,3 +2,8 @@
 ### IntelliJ IDEA ###
 **/.idea/**
 *.iml
+
+
+/jwt-social-login-client
+/PixelServer/auth-service
+/PixelServer/chat-service

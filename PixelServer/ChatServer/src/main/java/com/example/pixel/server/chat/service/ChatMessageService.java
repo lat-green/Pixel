@@ -1,20 +1,22 @@
 package com.example.pixel.server.chat.service;
 
-import com.example.pixel.server.chat.entity.ChatMessage;
-import com.example.pixel.server.chat.entity.MessageStatus;
+import com.example.pixel.server.chat.exception.ResourceNotFoundException;
+import com.example.pixel.server.chat.model.ChatMessage;
+import com.example.pixel.server.chat.model.MessageStatus;
 import com.example.pixel.server.chat.repository.ChatMessageRepository;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@AllArgsConstructor
 @Service
 public class ChatMessageService {
 
-    private final ChatMessageRepository repository;
-    private final ChatRoomService chatRoomService;
+    @Autowired
+    private ChatMessageRepository repository;
+    @Autowired
+    private ChatRoomService chatRoomService;
 
     public ChatMessage save(ChatMessage chatMessage) {
         chatMessage.setStatus(MessageStatus.RECEIVED);
@@ -22,12 +24,12 @@ public class ChatMessageService {
         return chatMessage;
     }
 
-    public long countNewMessages(String senderId, String recipientId) {
+    public long countNewMessages(Long senderId, Long recipientId) {
         return repository.countBySenderIdAndRecipientIdAndStatus(
                 senderId, recipientId, MessageStatus.RECEIVED);
     }
 
-    public List<ChatMessage> findChatMessages(String senderId, String recipientId) {
+    public List<ChatMessage> findChatMessages(Long senderId, Long recipientId) {
         var chatId = chatRoomService.getChatId(senderId, recipientId, false);
         var messages =
                 chatId.map(cId -> repository.findByChatId(cId)).orElse(new ArrayList<>());
@@ -37,20 +39,22 @@ public class ChatMessageService {
         return messages;
     }
 
-    public void updateStatuses(String senderId, String recipientId, MessageStatus status) {
-        repository.findBySenderIdAndRecipientId(senderId, recipientId).ifPresent(x -> {
-            x.setStatus(status);
-            repository.save(x);
+    public void updateStatuses(Long senderId, Long recipientId, MessageStatus status) {
+        repository.findAllBySenderIdAndRecipientId(senderId, recipientId).forEach(chatMessage -> {
+            chatMessage.setStatus(status);
+            repository.save(chatMessage);
         });
     }
 
-    public ChatMessage findById(Long id) {
+    public ChatMessage findById(String id) {
         return repository
                 .findById(id)
                 .map(chatMessage -> {
                     chatMessage.setStatus(MessageStatus.DELIVERED);
                     return repository.save(chatMessage);
-                }).orElseThrow();
+                })
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("can't find message (" + id + ")"));
     }
 
 }

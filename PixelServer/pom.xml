@@ -34,7 +34,9 @@
     </properties>
 
     <modules>
+        <module>auth-service</module>
         <module>AuthorizationServer</module>
+        <module>chat-service</module>
         <module>ChatServer</module>
     </modules>
 

@@ -1,17 +1,22 @@
 import {useEffect, useState} from "react";
-import {getOne, USER, User} from "../api/Data";
+import {getOneUser, User} from "../api/Data";
 
 
-export function useUser(id: number) {
+export function useIdUser(id: number) {
+    if (id === undefined)
+        throw new Error(`id === ${id}`)
     const [user, setUser] = useState<User | undefined>(undefined)
 
     useEffect(() => {
-        getOne(id).then((user) => {
+        getOneUser(id).then((user) => {
             setUser(user)
         })
     }, [id]);
 
-    return user ?? USER;
+    return user ?? {
+        id: id,
+        username: ""
+    };
 }
 
 

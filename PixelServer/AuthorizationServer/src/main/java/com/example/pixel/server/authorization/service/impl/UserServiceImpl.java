@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @AllArgsConstructor
 @Component("userService")
 public class UserServiceImpl implements UserService {
@@ -24,6 +26,11 @@ public class UserServiceImpl implements UserService {
     public User getOneUser(long id) {
         return this.repository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return repository.findAll();
     }
 
 }

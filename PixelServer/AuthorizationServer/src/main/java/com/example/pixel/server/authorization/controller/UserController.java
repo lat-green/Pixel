@@ -9,12 +9,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api")
 public class UserController {
 
     private final UserService service;
+
+    @GetMapping("/users")
+    public List<User> getAll() {
+        return service.getAllUsers();
+    }
 
     @GetMapping("/users/{id}")
     public User getOne(@PathVariable long id) {
