@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {Button} from "@mui/material";
 import {UserInfo, UserName, useUser} from "./user/User";
 import {Link, useParams} from "react-router-dom";
@@ -20,43 +20,38 @@ const Chat = (props) => {
 
     const [messages, setMessages] = useState([])
 
-    const addLocalMessage = (msg) => {
-        const newMessages = [...messages]
-        newMessages.push(msg);
-        setMessages(newMessages);
-    }
-
-    const onMessageReceived = (msg) => {
-        const notification = JSON.parse(msg.body);
-
-        if (recipient.id === notification.senderId) {
-            findChatMessage(notification.id).then((message) => {
-                addLocalMessage(message)
-            });
-        } else {
-            console.log("Received a new message from " + notification.senderName);
-        }
-    }
+    const addLocalMessage = useCallback((msg) => {
+        setMessages(messages => [
+            ...messages,
+            msg
+        ]);
+    }, [])
 
     useEffect(() => {
-        findChatMessages(recipient.id, currentUser.id).then((msgs) => setMessages(msgs))
-        stompClient = Stomp.over(() => {
-            return new SockJS(`${CHAT_URI}/ws`)
-        });
+        stompClient = Stomp.over(() => new SockJS(`${CHAT_URI}/ws`));
     }, []);
+
+    useEffect(() => {
+        findChatMessages(recipient.id, currentUser.id).then(setMessages)
+    }, [currentUser.id, recipient.id]);
+
+    const onError = (err) => {
+        console.log(`error ${err}`);
+    };
 
     useEffect(() => {
         stompClient.connect({}, () => {
             stompClient.subscribe(
                 "/user/" + currentUser.id + "/queue/messages",
-                onMessageReceived
+                (msg) => {
+                    const notification = JSON.parse(msg.body);
+                    if (recipient.id === notification.senderId) {
+                        findChatMessage(notification.id).then(addLocalMessage);
+                    }
+                }
             )
         }, onError);
-    });
-
-    const onError = (err) => {
-        console.log(`error ${err}`);
-    };
+    }, [addLocalMessage, currentUser.id, recipient.id]);
 
     const sendMessage = (msg) => {
         if (msg.trim() !== "") {
@@ -72,7 +67,7 @@ const Chat = (props) => {
 
             addLocalMessage(message)
 
-            // setText("")
+            setText("")
         }
     };
 
