@@ -1,10 +1,9 @@
 package com.example.pixel.server.authorization.config;
 
+import com.example.pixel.server.util.configuration.ServerAddress;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -23,12 +22,10 @@ public class RegisteredClientRepositoryConfiguration {
 
     private final PasswordEncoder passwordEncoder;
 
-    @DependsOn("serverAddress")
     @Bean
     public RegisteredClientRepository registeredClientRepository(
             TokenSettings settings,
-            @Value("${server.address}")
-            String address
+            ServerAddress address
     ) {
         return new InMemoryRegisteredClientRepository(
                 RegisteredClient
@@ -39,7 +36,8 @@ public class RegisteredClientRepositoryConfiguration {
                         .scope("write")
                         .clientSecret(passwordEncoder.encode("test-client"))
                         .redirectUri("https://oauth.pstmn.io/v1/browser-callback")
-                        .redirectUri("http://" + address + ":3000/auth/code")
+                        .redirectUri("http://" + address.getAddress() + ":3000/auth/code")
+                        .redirectUri("http://localhost:3000/auth/code")
                         .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                         .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                         .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)

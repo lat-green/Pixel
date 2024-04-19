@@ -1,5 +1,6 @@
 package com.example.pixel.server.chat.configuration;
 
+import com.example.pixel.server.util.configuration.ServerAddress;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.converter.DefaultContentTypeResolver;
@@ -17,11 +18,17 @@ import java.util.List;
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    private final String address;
+
+    public WebSocketConfig(ServerAddress address) {
+        this.address = address.getAddress();
+    }
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry
                 .addEndpoint("/ws")
-                .setAllowedOrigins("http://localhost:3000/", "http://192.168.121.231:3000/")
+                .setAllowedOrigins("http://localhost:3000/", "http://" + address + ":3000/")
                 .withSockJS();
     }
 

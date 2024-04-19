@@ -38,7 +38,18 @@
         <module>AuthorizationServer</module>
         <module>chat-service</module>
         <module>ChatServer</module>
+        <module>ServerUtil</module>
     </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.example.pixel.server</groupId>
+                <artifactId>server-util</artifactId>
+                <version>0.1</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <!-- tests -->

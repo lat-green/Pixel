@@ -1,13 +1,12 @@
 package com.example.pixel.server.authorization.config;
 
 import com.example.pixel.server.authorization.dto.TokenInfoDto;
+import com.example.pixel.server.util.configuration.ServerAddress;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -29,7 +28,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import java.io.IOException;
 
 @RequiredArgsConstructor
-@Configuration(proxyBeanMethods = false)
+@Configuration
 public class AuthorizationServerConfig {
 
     private final static String principalAttributeKey = "java.security.Principal";
@@ -87,14 +86,12 @@ public class AuthorizationServerConfig {
         mappingJackson2HttpMessageConverter.write(tokenInfoDtoBuilder.build(), null, httpResponse);
     }
 
-    @DependsOn("serverAddress")
     @Bean
     public AuthorizationServerSettings authorizationServerSettings(
-            @Value("${server.address}")
-            String address
+            ServerAddress address
     ) {
         return AuthorizationServerSettings.builder()
-                .issuer("http://" + address + ":7777")
+                .issuer("http://" + address.getAddress() + ":7777")
                 .tokenIntrospectionEndpoint("/oauth2/token-info")
                 .build();
     }

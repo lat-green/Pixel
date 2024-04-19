@@ -19,6 +19,12 @@
     </properties>
 
     <dependencies>
+        <!-- util -->
+        <dependency>
+            <groupId>com.example.pixel.server</groupId>
+            <artifactId>server-util</artifactId>
+        </dependency>
+
         <!-- tests -->
         <dependency>
             <groupId>org.springframework.security</groupId>

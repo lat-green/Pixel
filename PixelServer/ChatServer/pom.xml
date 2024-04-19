@@ -14,6 +14,12 @@
     <name>ChatServer</name>
 
     <dependencies>
+        <!-- util -->
+        <dependency>
+            <groupId>com.example.pixel.server</groupId>
+            <artifactId>server-util</artifactId>
+        </dependency>
+
         <!-- tests -->
         <dependency>
             <groupId>com.h2database</groupId>
