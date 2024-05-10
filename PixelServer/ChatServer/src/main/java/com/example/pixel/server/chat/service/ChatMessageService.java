@@ -2,21 +2,25 @@ package com.example.pixel.server.chat.service;
 
 import com.example.pixel.server.chat.exception.ResourceNotFoundException;
 import com.example.pixel.server.chat.model.ChatMessage;
+import com.example.pixel.server.chat.model.ChatRoom;
 import com.example.pixel.server.chat.model.MessageStatus;
 import com.example.pixel.server.chat.repository.ChatMessageRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.pixel.server.chat.repository.ChatUserRepository;
+import lombok.AllArgsConstructor;
+import lombok.val;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class ChatMessageService {
 
-    @Autowired
-    private ChatMessageRepository repository;
-    @Autowired
-    private ChatRoomService chatRoomService;
+    private final ChatMessageRepository repository;
+    private final ChatUserRepository userRepository;
+    private final ChatRoomService chatRoomService;
 
     public ChatMessage save(ChatMessage chatMessage) {
         chatMessage.setStatus(MessageStatus.RECEIVED);
@@ -25,25 +29,28 @@ public class ChatMessageService {
     }
 
     public long countNewMessages(Long senderId, Long recipientId) {
-        return repository.countBySenderIdAndRecipientIdAndStatus(
-                senderId, recipientId, MessageStatus.RECEIVED);
+        val sender = userRepository.getReferenceById(senderId);
+        val recipient = userRepository.getReferenceById(recipientId);
+        return chatRoomService.getChatRoom(senderId, recipientId, false)
+                .get()
+                .getMessages().stream().filter(m -> m.getStatus() == MessageStatus.RECEIVED).count();
     }
 
     public List<ChatMessage> findChatMessages(Long senderId, Long recipientId) {
-        var chatId = chatRoomService.getChatId(senderId, recipientId, false);
-        var messages =
-                chatId.map(cId -> repository.findByChatId(cId)).orElse(new ArrayList<>());
-        if (messages.size() > 0) {
+        var chatId = chatRoomService.getChatRoom(senderId, recipientId, false);
+        var messages = chatId.map(ChatRoom::getMessages).orElse(new ArrayList<>());
+        if (!messages.isEmpty()) {
             updateStatuses(senderId, recipientId, MessageStatus.DELIVERED);
         }
         return messages;
     }
 
+    @Transactional
     public void updateStatuses(Long senderId, Long recipientId, MessageStatus status) {
-        repository.findAllBySenderIdAndRecipientId(senderId, recipientId).forEach(chatMessage -> {
+        chatRoomService.getChatRoom(senderId, recipientId, false).ifPresent(room -> room.getMessages().forEach(chatMessage -> {
             chatMessage.setStatus(status);
             repository.save(chatMessage);
-        });
+        }));
     }
 
     public ChatMessage findById(String id) {

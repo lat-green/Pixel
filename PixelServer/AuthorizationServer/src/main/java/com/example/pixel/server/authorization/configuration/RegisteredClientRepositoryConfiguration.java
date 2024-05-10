@@ -1,4 +1,4 @@
-package com.example.pixel.server.authorization.config;
+package com.example.pixel.server.authorization.configuration;
 
 import com.example.pixel.server.util.configuration.ServerAddress;
 import lombok.AllArgsConstructor;

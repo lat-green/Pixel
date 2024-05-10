@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.0</version>
+        <version>3.2.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -34,9 +34,7 @@
     </properties>
 
     <modules>
-        <module>auth-service</module>
         <module>AuthorizationServer</module>
-        <module>chat-service</module>
         <module>ChatServer</module>
         <module>ServerUtil</module>
     </modules>
@@ -111,15 +109,7 @@
 
 
     <build>
-        <finalName>application</finalName>
         <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <mainClass>com.example.pixel.server.authorization.Main</mainClass>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>

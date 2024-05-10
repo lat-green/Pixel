@@ -2,43 +2,30 @@ package com.example.pixel.server.chat.service;
 
 import com.example.pixel.server.chat.model.ChatRoom;
 import com.example.pixel.server.chat.repository.ChatRoomRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.pixel.server.chat.repository.ChatUserRepository;
+import lombok.AllArgsConstructor;
+import lombok.val;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@AllArgsConstructor
 @Service
 public class ChatRoomService {
 
-    @Autowired
-    private ChatRoomRepository chatRoomRepository;
+    private final ChatUserRepository userRepository;
+    private final ChatRoomRepository repository;
 
-    public Optional<String> getChatId(
-            Long senderId, Long recipientId, boolean createIfNotExist) {
-        return chatRoomRepository
-                .findBySenderIdAndRecipientId(senderId, recipientId)
-                .map(ChatRoom::getChatId)
-                .or(() -> {
-                    if (!createIfNotExist) {
-                        return Optional.empty();
-                    }
-                    var chatId = senderId + "_" + recipientId;
-                    ChatRoom senderRecipient = ChatRoom
-                            .builder()
-                            .chatId(chatId)
-                            .senderId(senderId)
-                            .recipientId(recipientId)
-                            .build();
-                    ChatRoom recipientSender = ChatRoom
-                            .builder()
-                            .chatId(chatId)
-                            .senderId(recipientId)
-                            .recipientId(senderId)
-                            .build();
-                    chatRoomRepository.save(senderRecipient);
-                    chatRoomRepository.save(recipientSender);
-                    return Optional.of(chatId);
-                });
+    public Optional<ChatRoom> getChatRoom(Long senderId, Long recipientId, boolean createIfNotExist) {
+        val sender = userRepository.getReferenceById(senderId);
+        val recipient = userRepository.getReferenceById(recipientId);
+        val room = repository.findBySenderAndRecipient(sender, recipient);
+        if (createIfNotExist)
+            return Optional.of(room.orElseGet(() -> repository.save(ChatRoom.builder()
+                    .sender(sender)
+                    .recipient(recipient)
+                    .build())));
+        return room;
     }
 
 }

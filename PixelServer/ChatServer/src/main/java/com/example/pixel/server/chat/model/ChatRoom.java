@@ -1,12 +1,16 @@
 package com.example.pixel.server.chat.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import com.example.pixel.server.util.entity.EntityAsIdOnlySerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -18,8 +22,19 @@ public class ChatRoom {
     @Id
     @GeneratedValue
     private Long id;
-    private String chatId;
-    private Long senderId;
-    private Long recipientId;
+
+    @JsonSerialize(using = EntityAsIdOnlySerializer.class)
+    @OneToMany(mappedBy = "room", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<ChatMessage> messages = List.of();
+
+    @JsonSerialize(using = EntityAsIdOnlySerializer.class)
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private ChatUser sender;
+
+    @JsonSerialize(using = EntityAsIdOnlySerializer.class)
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private ChatUser recipient;
 
 }

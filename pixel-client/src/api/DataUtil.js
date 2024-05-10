@@ -1,4 +1,4 @@
-export const SERVER_IP = '192.168.106.231'
+export const SERVER_IP = '192.168.0.138'
 // export const SERVER_IP = new URL(window.location.origin).hostname
 const SERVER_PROTOCOL = `http://${SERVER_IP}`
 

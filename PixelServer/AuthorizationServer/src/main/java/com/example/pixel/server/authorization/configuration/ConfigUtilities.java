@@ -1,4 +1,4 @@
-package com.example.pixel.server.authorization.config;
+package com.example.pixel.server.authorization.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

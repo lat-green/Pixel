@@ -1,4 +1,4 @@
-package com.example.pixel.server.authorization.entity;
+package com.example.pixel.server.util.entity;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;

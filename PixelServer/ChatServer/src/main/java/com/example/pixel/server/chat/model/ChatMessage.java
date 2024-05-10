@@ -3,6 +3,7 @@ package com.example.pixel.server.chat.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,18 +22,11 @@ public class ChatMessage {
     @GeneratedValue
     private Long id;
 
-    private String chatId;
-
-    private Long senderId;
-    private Long recipientId;
-
-    private String senderName;
-    private String recipientName;
+    @ManyToOne
+    private ChatRoom room;
 
     private String content;
-
     private Date timestamp;
-
     private MessageStatus status;
 
 }

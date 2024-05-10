@@ -5,6 +5,10 @@ export interface User {
     username: string
 }
 
+export interface MessageCreateRequest {
+    content: string
+}
+
 export const USER = {
     id: -1,
     username: "Anonymous"
@@ -32,4 +36,11 @@ export async function findChatMessages(senderId: number, recipientId: number) {
 
 export async function findChatMessage(messageId: number) {
     return sfetch(`${CHAT_URI}/messages/${messageId}`).then(resp => resp.json());
+}
+
+export async function sendChatMessage(recipientId: number, request: MessageCreateRequest) {
+    return sfetch(`${CHAT_URI}/chats/${recipientId}/messages`, {
+        method: 'POST',
+        body: JSON.stringify(request),
+    }).then(resp => resp.json());
 }

@@ -7,9 +7,6 @@ import {User} from "../api/Data";
 
 export interface MessageInfo {
     senderId: number,
-    recipientId: number,
-    senderName: string,
-    recipientName: string,
     content: string,
     timestamp: Date,
 }

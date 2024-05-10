@@ -7,9 +7,9 @@ import {CHAT_URI} from "../api/DataUtil";
 import {Message} from "./NewChat";
 import SockJS from "sockjs-client";
 import {Stomp} from "@stomp/stompjs";
-import {findChatMessage, findChatMessages} from "../api/Data";
+import {findChatMessage, findChatMessages, sendChatMessage} from "../api/Data";
 
-let stompClient = null;
+let stompClient = Stomp.over(() => new SockJS(`${CHAT_URI}/ws`));
 
 const Chat = (props) => {
     const [text, setText] = useState('')
@@ -28,11 +28,11 @@ const Chat = (props) => {
     }, [])
 
     useEffect(() => {
-        stompClient = Stomp.over(() => new SockJS(`${CHAT_URI}/ws`));
-    }, []);
-
-    useEffect(() => {
-        findChatMessages(recipient.id, currentUser.id).then(setMessages)
+        findChatMessages(recipient.id, currentUser.id)
+            .then(msgs => {
+                console.log(msgs)
+            })
+        //.then(setMessages)
     }, [currentUser.id, recipient.id]);
 
     const onError = (err) => {
@@ -55,21 +55,19 @@ const Chat = (props) => {
 
     const sendMessage = (msg) => {
         if (msg.trim() !== "") {
-            const message = {
-                senderId: currentUser.id,
-                recipientId: recipient.id,
-                senderName: currentUser.username,
-                recipientName: recipient.username,
-                content: msg,
-                timestamp: new Date(),
-            };
-            stompClient.send("/app/chat", {}, JSON.stringify(message));
+            // stompClient.send("/app/chat", {}, JSON.stringify(message));
 
-            addLocalMessage(message)
+            sendChatMessage(recipient.id, {
+                content: msg,
+            }).then(message => {
+                addLocalMessage(message)
+            })
 
             setText("")
         }
     };
+
+    console.log("messages: ", messages)
 
     return (
         <div className="content">
