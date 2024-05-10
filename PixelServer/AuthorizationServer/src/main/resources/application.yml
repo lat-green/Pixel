@@ -1,0 +1,33 @@
+server:
+  port: 7777
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.springframework.security.oauth2: INFO
+
+spring:
+  security:
+    oauth2:
+      authorizationserver:
+        issuer: http://localhost:7777
+#        client:
+#          articles-client:
+#            registration:
+#              client-id: test-client
+#              client-secret: "{noop}test-client"
+#              client-name: Test Client
+#              client-authentication-methods:
+#                - client_secret_basic
+#              authorization-grant-types:
+#                - authorization_code
+#                - refresh_token
+#              redirect-uris:
+#                - http://127.0.0.1:8080/login/oauth2/code/articles-client-oidc
+#                - http://127.0.0.1:8080/authorized
+#                - https://oauth.pstmn.io/v1/browser-callback
+#              scopes:
+#                - openid
+#                - articles.read
