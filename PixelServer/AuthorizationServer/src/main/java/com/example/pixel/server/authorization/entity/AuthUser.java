@@ -74,8 +74,8 @@ public class AuthUser implements BaseEntity, UserDetails {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        AuthUser user = (AuthUser) o;
-        return Objects.equals(id, user.id);
+        AuthUser other = (AuthUser) o;
+        return Objects.equals(id, other.id);
     }
 
     @Override

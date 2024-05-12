@@ -1,9 +1,6 @@
 package com.example.pixel.server.util.controller.advice;
 
-import com.example.pixel.server.util.controller.advice.exception.ForbiddenException;
-import com.example.pixel.server.util.controller.advice.exception.NotHaveTokenException;
-import com.example.pixel.server.util.controller.advice.exception.UserAlreadyExists;
-import com.example.pixel.server.util.controller.advice.exception.UserNotFoundException;
+import com.example.pixel.server.util.controller.advice.exception.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -44,7 +41,7 @@ public class AllExceptionControllerAdvice {
     }
 
     @ResponseBody
-    @ExceptionHandler({UserNotFoundException.class})
+    @ExceptionHandler({UserNotFoundException.class, NotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Object notFoundException(RuntimeException e, WebRequest request) {
         return newException(e, request);

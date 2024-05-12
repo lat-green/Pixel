@@ -1,9 +1,6 @@
 package com.example.pixel.server.util.controller.advice.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
-public class UserNotFoundException extends RuntimeException {
+public class UserNotFoundException extends NotFoundException {
 
     public UserNotFoundException(Long id) {
         super("Could not find user with id = " + id);
