@@ -10,9 +10,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
+
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -34,6 +38,15 @@ public class SecurityConfig {
                 }
             }
         };
+    }
+
+    @Bean
+    TokenSettings tokenSettings() {
+        return TokenSettings.builder()
+                .accessTokenTimeToLive(Duration.of(30, ChronoUnit.MINUTES))
+                .refreshTokenTimeToLive(Duration.of(48, ChronoUnit.HOURS))
+                .authorizationCodeTimeToLive(Duration.of(30, ChronoUnit.SECONDS))
+                .build();
     }
 
     @Bean

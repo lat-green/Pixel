@@ -8,6 +8,7 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,8 @@ public class CustomRegisteredClientRepository implements RegisteredClientReposit
 
     private final ClientRepository clientRepository;
 
+    private final TokenSettings tokenSettings;
+
     @Override
     public void save(RegisteredClient registeredClient) {
         throw new IllegalArgumentException("save(" + registeredClient + ")");
@@ -24,7 +27,6 @@ public class CustomRegisteredClientRepository implements RegisteredClientReposit
 
     @Override
     public RegisteredClient findById(String id) {
-
         throw new IllegalArgumentException("findById(" + id + ")");
     }
 
@@ -35,7 +37,7 @@ public class CustomRegisteredClientRepository implements RegisteredClientReposit
         return toRegisteredClient(client);
     }
 
-    private static RegisteredClient toRegisteredClient(AuthClient client) {
+    private RegisteredClient toRegisteredClient(AuthClient client) {
         var builder = RegisteredClient.withId("" + client.getId())
                 .clientName(client.getClientName())
                 .clientId(client.getClientId())
@@ -43,7 +45,8 @@ public class CustomRegisteredClientRepository implements RegisteredClientReposit
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN);
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                .tokenSettings(tokenSettings);
         for (var scope : client.getScopes())
             builder.scope(scope.getName());
         for (var scope : client.getRedirectUris())

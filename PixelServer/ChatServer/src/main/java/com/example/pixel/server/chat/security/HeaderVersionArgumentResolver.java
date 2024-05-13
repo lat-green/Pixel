@@ -1,4 +1,4 @@
-package com.example.pixel.server.chat;
+package com.example.pixel.server.chat.security;
 
 import com.example.pixel.server.chat.entity.ChatUser;
 import com.example.pixel.server.chat.service.UserService;

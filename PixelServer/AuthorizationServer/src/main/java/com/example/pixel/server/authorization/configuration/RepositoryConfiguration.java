@@ -34,9 +34,9 @@ public class RepositoryConfiguration {
     @Transactional
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
-        final var articles_read = clientScopeRepository.findByName("articles.read").orElseGet(() -> {
+        final var testScope = clientScopeRepository.findByName("test").orElseGet(() -> {
             var m = new AuthClientScope();
-            m.setName("articles.read");
+            m.setName("test");
             return clientScopeRepository.save(m);
         });
         final var testClient = clientRepository.findByClientId("test-client").orElseGet(() -> {
@@ -44,7 +44,7 @@ public class RepositoryConfiguration {
             m.setClientName("Test Client");
             m.setClientId("test-client");
             m.setClientSecret(passwordEncoder.encode("test-client"));
-            m.setScopes(Set.of(articles_read));
+            m.setScopes(Set.of(testScope));
             var postmanCallback = new AuthRedirectUri();
             postmanCallback.setName("https://oauth.pstmn.io/v1/browser-callback");
             postmanCallback.setClient(m);

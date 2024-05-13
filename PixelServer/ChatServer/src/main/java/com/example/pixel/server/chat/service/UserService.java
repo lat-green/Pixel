@@ -21,17 +21,6 @@ public class UserService {
     public void deleteUser(long id) {
         repository.deleteById(id);
     }
-//    @Transactional
-//    public User replaceUser(long id, UserReplaceRequest request) {
-//        var user = getOneUser(id);
-//        var username = request.getUsername();
-//        if (username != null)
-//            user.setUsername(username);
-//        var password = request.getPassword();
-//        if (password != null)
-//            user.setUsername(password);
-//        return repository.save(user);
-//    }
 
     public ChatUser getOneUser(long id) {
         return repository.findById(id)

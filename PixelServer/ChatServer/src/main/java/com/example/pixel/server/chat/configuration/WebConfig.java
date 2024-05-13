@@ -1,6 +1,6 @@
 package com.example.pixel.server.chat.configuration;
 
-import com.example.pixel.server.chat.HeaderVersionArgumentResolver;
+import com.example.pixel.server.chat.security.HeaderVersionArgumentResolver;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
