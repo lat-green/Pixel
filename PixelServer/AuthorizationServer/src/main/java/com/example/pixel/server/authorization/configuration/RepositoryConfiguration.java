@@ -57,6 +57,12 @@ public class RepositoryConfiguration {
             m.setPassword(passwordEncoder.encode("1234"));
             return userRepository.save(m);
         });
+        final var maksim = userRepository.findByUsername("Maksim").orElseGet(() -> {
+            var m = new AuthUser();
+            m.setUsername("Maksim");
+            m.setPassword(passwordEncoder.encode("1234"));
+            return userRepository.save(m);
+        });
     }
 
 }

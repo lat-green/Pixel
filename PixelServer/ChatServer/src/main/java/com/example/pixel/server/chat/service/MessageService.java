@@ -1,6 +1,6 @@
 package com.example.pixel.server.chat.service;
 
-import com.example.pixel.server.chat.entity.ChatMessage;
+import com.example.pixel.server.chat.entity.message.ChatMessage;
 import com.example.pixel.server.chat.exception.MessageNotFoundException;
 import com.example.pixel.server.chat.repository.MessageRepository;
 import lombok.AllArgsConstructor;

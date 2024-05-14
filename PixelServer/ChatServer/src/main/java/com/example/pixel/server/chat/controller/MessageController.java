@@ -1,6 +1,6 @@
 package com.example.pixel.server.chat.controller;
 
-import com.example.pixel.server.chat.entity.ChatMessage;
+import com.example.pixel.server.chat.entity.message.ChatMessage;
 import com.example.pixel.server.chat.service.MessageService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
