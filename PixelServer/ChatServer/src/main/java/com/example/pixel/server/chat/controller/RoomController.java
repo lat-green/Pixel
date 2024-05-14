@@ -1,7 +1,10 @@
 package com.example.pixel.server.chat.controller;
 
+import com.example.pixel.server.chat.dto.room.ChatGroupRoomCreateRequest;
 import com.example.pixel.server.chat.entity.ChatUser;
+import com.example.pixel.server.chat.entity.attachment.ChatChannelUserAttachment;
 import com.example.pixel.server.chat.entity.room.ChatChannelRoom;
+import com.example.pixel.server.chat.entity.room.ChatContactRoom;
 import com.example.pixel.server.chat.entity.room.ChatGroupRoom;
 import com.example.pixel.server.chat.entity.room.ChatRoom;
 import com.example.pixel.server.chat.serializer.ChatUserAttachmentToRoomSerializer;
@@ -10,10 +13,7 @@ import com.example.pixel.server.util.controller.advice.exception.ForbiddenExcept
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
@@ -42,10 +42,17 @@ public class RoomController {
             var users = channel.getUsers();
             if (!users.stream().anyMatch(x -> x.getUser().equals(user)))
                 throw new ForbiddenException("To receive a list of participants you must be a member");
-            var json = objectMapper.writeValueAsString(users);
+            var json = objectMapper.writeValueAsString(users.stream().filter(x -> x.getRole() != ChatChannelUserAttachment.ChatChannelRole.PRIVATE_USER).toList());
             return json;
         }
         if (room instanceof ChatGroupRoom channel) {
+            var users = channel.getUsers();
+            if (!users.stream().anyMatch(x -> x.getUser().equals(user)))
+                throw new ForbiddenException("To receive a list of participants you must be a member");
+            var json = objectMapper.writeValueAsString(users);
+            return json;
+        }
+        if (room instanceof ChatContactRoom channel) {
             var users = channel.getUsers();
             if (!users.stream().anyMatch(x -> x.getUser().equals(user)))
                 throw new ForbiddenException("To receive a list of participants you must be a member");
@@ -58,6 +65,14 @@ public class RoomController {
     @GetMapping("")
     public Collection<ChatRoom> getAllRooms() {
         return roomService.getAllRooms();
+    }
+
+    @PostMapping("/group")
+    public ChatRoom createGroupRoom(
+            ChatUser user,
+            @RequestBody ChatGroupRoomCreateRequest request
+    ) {
+        return roomService.createGroupRoom(user, request);
     }
 
 }

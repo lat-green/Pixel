@@ -25,19 +25,19 @@ public abstract class ChatMessage implements BaseEntity {
 
     @Id
     @GeneratedValue
-    private long id;
+    protected long id;
 
     @Column(nullable = false)
-    private Date sendTime = new Date();
+    protected Date sendTime = new Date();
 
     @JsonSerialize(using = EntityAsIdOnlySerializer.class)
     @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private ChatUser user;
+    protected ChatUser user;
 
     @JsonSerialize(using = EntityAsIdOnlySerializer.class)
     @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private ChatRoom room;
+    protected ChatRoom room;
 
 }
