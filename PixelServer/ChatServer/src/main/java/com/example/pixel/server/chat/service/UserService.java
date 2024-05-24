@@ -1,6 +1,6 @@
 package com.example.pixel.server.chat.service;
 
-import com.example.pixel.server.chat.entity.ChatUser;
+import com.example.pixel.server.chat.entity.Customer;
 import com.example.pixel.server.chat.repository.UserRepository;
 import com.example.pixel.server.util.controller.advice.exception.UserNotFoundException;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ public class UserService {
 
     private UserRepository repository;
 
-    public Collection<ChatUser> getAllUsers() {
+    public Collection<Customer> getAllUsers() {
         return repository.findAll();
     }
 
@@ -22,7 +22,7 @@ public class UserService {
         repository.deleteById(id);
     }
 
-    public ChatUser getOneUser(long id) {
+    public Customer getOneUser(long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
     }

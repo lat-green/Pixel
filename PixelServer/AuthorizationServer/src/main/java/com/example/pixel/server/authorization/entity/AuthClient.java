@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.Objects;
 import java.util.Set;
@@ -40,6 +42,11 @@ public class AuthClient implements BaseEntity {
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<AuthRedirectUri> redirectUris;
 
+    @JsonSerialize(using = EntityAsNameOnlySerializer.class)
+    @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private AuthUser owner;
+
     @Override
     public int hashCode() {
         return Objects.hash(id);
@@ -56,6 +63,14 @@ public class AuthClient implements BaseEntity {
     @Override
     public String toString() {
         return "AuthClient(" + id + ")";
+    }
+
+    public AuthUser getOwner() {
+        return owner;
+    }
+
+    public void setOwner(AuthUser authUsers) {
+        this.owner = authUsers;
     }
 
 }

@@ -1,17 +1,12 @@
 import React, {useState} from "react";
-import {Button} from "@mui/material";
+import {Button, Skeleton} from "@mui/material";
 import {UserInfo, UserName, useUser} from "./user/User";
 import {Link, useParams} from "react-router-dom";
-import {useIdUser} from "./util";
-import {User} from "../api/Data";
+import {User} from "../api/data/User";
+import {MessageInfo} from "../api/data/Message";
+import {useOneUser} from "./HookUtil";
 
-export interface MessageInfo {
-    senderId: number,
-    content: string,
-    timestamp: Date,
-}
-
-export function useMessages(sender: User, recipient: User): MessageInfo[] | undefined {
+export function useMessages(sender: User, recipient?: User): MessageInfo[] | undefined {
     const [messages, setMessages] = useState<MessageInfo[]>();
 
     // findChatMessages(sender.id, recipient.id).then((msgs) =>
@@ -26,7 +21,7 @@ export function RealChat() {
 
     const currentUser = useUser()
 
-    const recipient = useIdUser(parseInt(useParams().id!!))
+    const recipient = useOneUser(parseInt(useParams().id!!))
 
     const messages = useMessages(currentUser, recipient)
 
@@ -34,6 +29,9 @@ export function RealChat() {
         setText("");
         console.log(`send ${text}`)
     }
+
+    if (!recipient)
+        return (<Skeleton/>)
 
     return (
         <div className="content">
@@ -47,7 +45,7 @@ export function RealChat() {
                 {
                     messages
                         ? messages.map(message => (
-                            <Message text={message.content} senderId={message.senderId}/>
+                            <Message message={message} senderId={message.user}/>
                         ))
                         : null
                 }
@@ -77,8 +75,18 @@ export function RealChat() {
     )
 }
 
-export function Message({senderId, text}: { senderId: number, text: string }) {
-    const sender = useIdUser(senderId)
+export function Message({senderId, message}: { senderId: number, message: MessageInfo }) {
+    if (message.type === 'text')
+        return (<TextMessage senderId={senderId} text={message.content}/>)
+
+    throw new Error("" + message)
+}
+
+export function TextMessage({senderId, text}: { senderId: number, text: string }) {
+    const sender = useOneUser(senderId)
+
+    if (!sender)
+        return (<Skeleton/>)
 
     return (
         <li>

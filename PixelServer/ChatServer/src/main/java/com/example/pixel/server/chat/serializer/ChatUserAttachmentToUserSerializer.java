@@ -1,8 +1,8 @@
 package com.example.pixel.server.chat.serializer;
 
 import com.example.pixel.server.chat.entity.attachment.ChatChannelUserAttachment;
-import com.example.pixel.server.chat.entity.attachment.ChatGroupUserAttachment;
 import com.example.pixel.server.chat.entity.attachment.ChatUserAttachment;
+import com.example.pixel.server.chat.entity.attachment.GroupUserAttachment;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
@@ -24,9 +24,9 @@ public class ChatUserAttachmentToUserSerializer extends StdSerializer<ChatUserAt
 
     @Override
     public void serialize(ChatUserAttachment entity, JsonGenerator generator, SerializerProvider provider) throws IOException {
-        if (entity instanceof ChatGroupUserAttachment e) {
+        if (entity instanceof GroupUserAttachment e) {
             generator.writeStartObject();
-            generator.writeNumberField("group", e.getGroup().getId());
+            generator.writeNumberField("id", e.getGroup().getId());
             generator.writeStringField("role", e.getRole().name());
             generator.writeStringField("type", "group");
             generator.writeEndObject();
@@ -34,7 +34,7 @@ public class ChatUserAttachmentToUserSerializer extends StdSerializer<ChatUserAt
         }
         if (entity instanceof ChatChannelUserAttachment e) {
             generator.writeStartObject();
-            generator.writeNumberField("channel", e.getChannel().getId());
+            generator.writeNumberField("id", e.getChannel().getId());
             generator.writeStringField("role", e.getRole().name());
             generator.writeStringField("type", "channel");
             generator.writeEndObject();

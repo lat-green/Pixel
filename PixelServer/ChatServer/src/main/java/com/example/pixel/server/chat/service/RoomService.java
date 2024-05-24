@@ -1,10 +1,10 @@
 package com.example.pixel.server.chat.service;
 
 import com.example.pixel.server.chat.dto.room.ChatGroupRoomCreateRequest;
-import com.example.pixel.server.chat.entity.ChatUser;
-import com.example.pixel.server.chat.entity.attachment.ChatGroupUserAttachment;
-import com.example.pixel.server.chat.entity.room.ChatGroupRoom;
-import com.example.pixel.server.chat.entity.room.ChatRoom;
+import com.example.pixel.server.chat.entity.Customer;
+import com.example.pixel.server.chat.entity.attachment.GroupUserAttachment;
+import com.example.pixel.server.chat.entity.chat.Chat;
+import com.example.pixel.server.chat.entity.chat.ChatGroup;
 import com.example.pixel.server.chat.exception.RoomNotFoundException;
 import com.example.pixel.server.chat.repository.GroupAttachmentRepository;
 import com.example.pixel.server.chat.repository.RoomRepository;
@@ -20,28 +20,28 @@ public class RoomService {
     private RoomRepository repository;
     private GroupAttachmentRepository attachmentRepository;
 
-    public Collection<ChatRoom> getAllRooms() {
+    public Collection<Chat> getAllRooms() {
         return repository.findAll();
     }
 
-    public ChatRoom getOneRoom(long id) {
+    public Chat getOneRoom(long id) {
         return repository.findById(id).orElseThrow(() -> new RoomNotFoundException(id));
     }
 
-    public ChatRoom createGroupRoom(
-            ChatUser user,
+    public Chat createGroupRoom(
+            Customer user,
             ChatGroupRoomCreateRequest request
     ) {
-        var room = new ChatGroupRoom();
+        var room = new ChatGroup();
         room.setTitle(request.getTitle());
         room = repository.save(room);
-        createAttachment(room, user, ChatGroupUserAttachment.ChatGroupRole.ADMIN);
+        createAttachment(room, user, GroupUserAttachment.ChatGroupRole.ADMIN);
         return room;
     }
 
-    private ChatGroupUserAttachment createAttachment(ChatGroupRoom group, ChatUser user, ChatGroupUserAttachment.ChatGroupRole role) {
+    private GroupUserAttachment createAttachment(ChatGroup group, Customer user, GroupUserAttachment.ChatGroupRole role) {
         return attachmentRepository.findByGroupAndUser(group, user).orElseGet(() -> {
-            var attachment = new ChatGroupUserAttachment();
+            var attachment = new GroupUserAttachment();
             attachment.setGroup(group);
             attachment.setUser(user);
             attachment.setRole(role);

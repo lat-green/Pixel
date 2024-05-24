@@ -6,10 +6,10 @@ import com.example.pixel.server.util.controller.advice.exception.UserNotFoundExc
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
-@Component
+@Service
 public class UserService implements UserDetailsService {
 
     private UserRepository repository;

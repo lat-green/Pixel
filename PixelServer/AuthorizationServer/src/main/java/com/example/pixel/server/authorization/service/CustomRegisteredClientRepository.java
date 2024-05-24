@@ -8,6 +8,7 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,8 @@ public class CustomRegisteredClientRepository implements RegisteredClientReposit
     private final ClientRepository clientRepository;
 
     private final TokenSettings tokenSettings;
+
+    private final ClientSettings clientSettings;
 
     @Override
     public void save(RegisteredClient registeredClient) {
@@ -46,6 +49,7 @@ public class CustomRegisteredClientRepository implements RegisteredClientReposit
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                .clientSettings(clientSettings)
                 .tokenSettings(tokenSettings);
         for (var scope : client.getScopes())
             builder.scope(scope.getName());

@@ -1,7 +1,7 @@
 package com.example.pixel.server.chat.controller;
 
-import com.example.pixel.server.chat.entity.ChatUser;
-import com.example.pixel.server.chat.entity.message.ChatMessage;
+import com.example.pixel.server.chat.entity.Customer;
+import com.example.pixel.server.chat.entity.message.Message;
 import com.example.pixel.server.chat.service.MessageService;
 import com.example.pixel.server.util.controller.advice.exception.ForbiddenException;
 import lombok.AllArgsConstructor;
@@ -18,9 +18,9 @@ public class MessageController {
     private final MessageService messageService;
 
     @GetMapping("/{id}")
-    public ChatMessage getOneMessage(@PathVariable long id, ChatUser user) {
+    public Message getOneMessage(@PathVariable long id, Customer user) {
         var message = messageService.getOneMessage(id);
-        if (!message.getRoom().getUserRole(user).canRead)
+        if (!message.getChat().getUserRole(user).canRead)
             throw new ForbiddenException("can not get message with id = " + id + " because it's not your chat");
         return message;
     }

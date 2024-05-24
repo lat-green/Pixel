@@ -1,6 +1,7 @@
-import React, {PropsWithChildren, useContext, useEffect, useState} from "react";
-import {getMeUser, getOneUser, User} from "../../api/Data";
-import {Skeleton} from "@mui/material";
+import React, {PropsWithChildren, useContext} from "react";
+import {Avatar, Skeleton} from "@mui/material";
+import {User} from "../../api/data/User";
+import {useMeUser, useOneUser} from "../HookUtil";
 
 export const UserContext = React.createContext<User | undefined>(undefined)
 
@@ -12,23 +13,24 @@ export function UserInfo({user, children}: PropsWithChildren<{ user: User }>) {
     )
 }
 
+export function UserName({}) {
+    const user = useContext(UserContext)
+    if (user)
+        return (<>{user.username}</>)
+    return (<Skeleton/>)
+}
+
 export function useUser() {
     return useContext(UserContext)!!
 }
 
 export function UserIdInfo({id, children}: PropsWithChildren<{ id: number }>) {
-    const [user, setUser] = useState<User>()
-
-    useEffect(() => {
-        getOneUser(id).then((user) => {
-            setUser(user)
-        })
-    }, [id])
+    const user = useOneUser(id)
 
     return (
         <>
             {
-                user !== null && user !== undefined ?
+                user ?
                     <UserInfo user={user}>
                         {children}
                     </UserInfo>
@@ -39,18 +41,12 @@ export function UserIdInfo({id, children}: PropsWithChildren<{ id: number }>) {
 }
 
 export function UserMeInfo({children}: PropsWithChildren) {
-    const [user, setUser] = useState<User>()
-
-    useEffect(() => {
-        getMeUser().then((user) => {
-            setUser(user)
-        })
-    }, [])
+    const user = useMeUser()
 
     return (
         <>
             {
-                user !== null && user !== undefined ?
+                user ?
                     <UserInfo user={user}>
                         {children}
                     </UserInfo>
@@ -60,35 +56,31 @@ export function UserMeInfo({children}: PropsWithChildren) {
     )
 }
 
-export function UserName({}) {
+
+export function UserAvatar({}) {
     const user = useContext(UserContext)
-    if (user)
-        return (<>{user.username}</>)
-    return (<Skeleton/>)
+    if (user) {
+        const name = user.username
+        return (
+            <Avatar
+                src={user.avatar}
+                alt={name}
+                sx={{
+                    width: 40,
+                    height: 40
+                }}
+            >
+                {getFirstLitter(name)}
+            </Avatar>
+        )
+    }
+    return (<Skeleton variant="circular" width={40} height={40}/>)
 }
 
-export function AnonymousOnly({children}: PropsWithChildren) {
-    const user = useContext(UserContext)!!
-    return (
-        <>
-            {
-                user.id === -1
-                    ? <> {children} </>
-                    : null
-            }
-        </>
-    )
-}
-
-export function AuthorizationOnly({children}: PropsWithChildren) {
-    const user = useContext(UserContext)!!
-    return (
-        <>
-            {
-                user.id !== -1
-                    ? <> {children} </>
-                    : null
-            }
-        </>
-    )
+function getFirstLitter(name: string) {
+    const words = name.split(' ', 2);
+    let result = ''
+    for (const word of words)
+        result += word[0]
+    return result
 }

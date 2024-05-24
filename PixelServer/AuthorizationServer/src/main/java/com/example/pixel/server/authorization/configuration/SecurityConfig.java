@@ -10,10 +10,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -24,6 +28,24 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
+
+    @Bean
+    public CorsFilter corsFilter() {
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        final CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(false);
+        config.addAllowedOrigin("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("OPTIONS");
+        config.addAllowedMethod("HEAD");
+        config.addAllowedMethod("GET");
+        config.addAllowedMethod("PUT");
+        config.addAllowedMethod("POST");
+        config.addAllowedMethod("DELETE");
+        config.addAllowedMethod("PATCH");
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
 
     @Bean
     public OAuth2TokenCustomizer<JwtEncodingContext> accessTokenCustomizer() {
@@ -41,15 +63,6 @@ public class SecurityConfig {
     }
 
     @Bean
-    TokenSettings tokenSettings() {
-        return TokenSettings.builder()
-                .accessTokenTimeToLive(Duration.of(30, ChronoUnit.MINUTES))
-                .refreshTokenTimeToLive(Duration.of(48, ChronoUnit.HOURS))
-                .authorizationCodeTimeToLive(Duration.of(30, ChronoUnit.SECONDS))
-                .build();
-    }
-
-    @Bean
     @Order(1)
     SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
@@ -61,10 +74,27 @@ public class SecurityConfig {
     @Bean
     @Order(2)
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest()
-                        .authenticated())
+        http
+                .authorizeHttpRequests(authorizeRequests ->
+                        authorizeRequests.anyRequest().authenticated()
+                )
                 .formLogin(withDefaults());
         return http.build();
+    }
+
+    @Bean
+    ClientSettings clientSettings() {
+        return ClientSettings.builder()
+                .build();
+    }
+
+    @Bean
+    TokenSettings tokenSettings() {
+        return TokenSettings.builder()
+                .accessTokenTimeToLive(Duration.of(30, ChronoUnit.DAYS))
+                .refreshTokenTimeToLive(Duration.of(3, ChronoUnit.DAYS))
+                .authorizationCodeTimeToLive(Duration.of(30, ChronoUnit.MINUTES))
+                .build();
     }
 
 }

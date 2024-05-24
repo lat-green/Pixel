@@ -1,12 +1,14 @@
 package com.example.pixel.server.chat.controller;
 
+import com.example.pixel.server.chat.controller.securiry.HasScopeRead;
+import com.example.pixel.server.chat.controller.securiry.HasScopeWrite;
 import com.example.pixel.server.chat.dto.room.ChatGroupRoomCreateRequest;
-import com.example.pixel.server.chat.entity.ChatUser;
+import com.example.pixel.server.chat.entity.Customer;
 import com.example.pixel.server.chat.entity.attachment.ChatChannelUserAttachment;
-import com.example.pixel.server.chat.entity.room.ChatChannelRoom;
-import com.example.pixel.server.chat.entity.room.ChatContactRoom;
-import com.example.pixel.server.chat.entity.room.ChatGroupRoom;
-import com.example.pixel.server.chat.entity.room.ChatRoom;
+import com.example.pixel.server.chat.entity.chat.Chat;
+import com.example.pixel.server.chat.entity.chat.ChatChannel;
+import com.example.pixel.server.chat.entity.chat.ChatContact;
+import com.example.pixel.server.chat.entity.chat.ChatGroup;
 import com.example.pixel.server.chat.serializer.ChatUserAttachmentToRoomSerializer;
 import com.example.pixel.server.chat.service.RoomService;
 import com.example.pixel.server.util.controller.advice.exception.ForbiddenException;
@@ -31,28 +33,29 @@ public class RoomController {
     }
 
     @GetMapping("/{id}")
-    public ChatRoom getOneRoom(@PathVariable long id) {
+    public Chat getOneRoom(@PathVariable long id) {
         return roomService.getOneRoom(id);
     }
 
+    @HasScopeRead
     @GetMapping("/{id}/users")
-    public String getOneRoomUsers(@PathVariable long id, ChatUser user) throws JsonProcessingException {
+    public String getOneRoomUsers(@PathVariable long id, Customer user) throws JsonProcessingException {
         var room = roomService.getOneRoom(id);
-        if (room instanceof ChatChannelRoom channel) {
+        if (room instanceof ChatChannel channel) {
             var users = channel.getUsers();
             if (!users.stream().anyMatch(x -> x.getUser().equals(user)))
                 throw new ForbiddenException("To receive a list of participants you must be a member");
             var json = objectMapper.writeValueAsString(users.stream().filter(x -> x.getRole() != ChatChannelUserAttachment.ChatChannelRole.PRIVATE_USER).toList());
             return json;
         }
-        if (room instanceof ChatGroupRoom channel) {
+        if (room instanceof ChatGroup channel) {
             var users = channel.getUsers();
             if (!users.stream().anyMatch(x -> x.getUser().equals(user)))
                 throw new ForbiddenException("To receive a list of participants you must be a member");
             var json = objectMapper.writeValueAsString(users);
             return json;
         }
-        if (room instanceof ChatContactRoom channel) {
+        if (room instanceof ChatContact channel) {
             var users = channel.getUsers();
             if (!users.stream().anyMatch(x -> x.getUser().equals(user)))
                 throw new ForbiddenException("To receive a list of participants you must be a member");
@@ -63,13 +66,14 @@ public class RoomController {
     }
 
     @GetMapping("")
-    public Collection<ChatRoom> getAllRooms() {
+    public Collection<Chat> getAllRooms() {
         return roomService.getAllRooms();
     }
 
+    @HasScopeWrite
     @PostMapping("/group")
-    public ChatRoom createGroupRoom(
-            ChatUser user,
+    public Chat createGroupRoom(
+            Customer user,
             @RequestBody ChatGroupRoomCreateRequest request
     ) {
         return roomService.createGroupRoom(user, request);

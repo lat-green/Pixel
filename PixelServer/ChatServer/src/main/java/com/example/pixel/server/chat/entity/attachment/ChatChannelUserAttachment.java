@@ -1,6 +1,6 @@
 package com.example.pixel.server.chat.entity.attachment;
 
-import com.example.pixel.server.chat.entity.room.ChatChannelRoom;
+import com.example.pixel.server.chat.entity.chat.ChatChannel;
 import com.example.pixel.server.util.entity.EntityAsIdOnlySerializer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -25,10 +25,15 @@ public class ChatChannelUserAttachment extends ChatUserAttachment {
     @JsonSerialize(using = EntityAsIdOnlySerializer.class)
     @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private ChatChannelRoom channel;
+    private ChatChannel channel;
 
     @Column(nullable = false)
     private ChatChannelRole role;
+
+    @Override
+    public ChatChannel getChatRoom() {
+        return channel;
+    }
 
     @JsonProperty("type")
     private String getTypeForJSON() {

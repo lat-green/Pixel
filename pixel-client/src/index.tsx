@@ -3,13 +3,17 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import {BrowserRouter} from "react-router-dom";
+import {AuthProvider} from "react-oauth2-code-pkce";
+import {authConfig} from "./api/ServerAuthUtil";
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
 );
 root.render(
     <BrowserRouter>
-        <App/>
+        <AuthProvider authConfig={authConfig}>
+            <App/>
+        </AuthProvider>
     </BrowserRouter>
 );
 

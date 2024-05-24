@@ -1,6 +1,6 @@
 package com.example.pixel.server.chat.configuration;
 
-import com.example.pixel.server.chat.security.HeaderVersionArgumentResolver;
+import com.example.pixel.server.chat.security.UserByIdArgumentResolver;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -12,7 +12,7 @@ import java.util.List;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    private final HeaderVersionArgumentResolver resolver;
+    private final UserByIdArgumentResolver resolver;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {

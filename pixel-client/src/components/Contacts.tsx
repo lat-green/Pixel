@@ -1,48 +1,55 @@
-import React, {DependencyList, useEffect, useState} from "react";
-import {getAllUsers, User} from "../api/Data";
-import {Link} from "react-router-dom";
-import {useUser} from "./user/User";
+import React, {useCallback} from "react";
+import {List, ListItem, ListItemButton, ListItemIcon, ListItemText, Skeleton} from "@mui/material";
+import {useFetch, useOneRoom} from "./HookUtil";
+import {getMeChats} from "../api/data/User";
+import {AccountBox} from "@mui/icons-material";
+import InboxIcon from '@mui/icons-material/MoveToInbox';
+import MailIcon from '@mui/icons-material/Mail';
 
-function useFetch<T>(func: () => Promise<T>, deps?: DependencyList): T | undefined {
-    const [result, setResult] = useState<T>()
-
-    useEffect(() => {
-        func().then(result => {
-            setResult(result)
-        })
-    }, deps);
-
-    return result
-}
-
-export function Contacts() {
-    const me = useUser()
-    const chats = useFetch(getAllUsers, [])
-
-    if (!chats)
-        return (
-            <>
-                Loading ...
-            </>
-        )
+export function Contacts({onClick}: { onClick: (event: number) => void }) {
+    const rooms = useFetch(getMeChats, [])
 
     return (
-        <ul>
+        <List>
             {
-                chats.filter(user => user.id !== me.id).map((user) => (
-                    ChatComponent({user})
-                ))
+                rooms
+                    ?
+                    rooms.map(roomId =>
+                        <ListItem key={roomId} disablePadding>
+                            <ChatComponent roomId={roomId} onClick={onClick}/>
+                        </ListItem>
+                    )
+                    : <Skeleton/>
             }
-        </ul>
+        </List>
     )
 }
 
-function ChatComponent({user}: { user: User }) {
+function ChatComponent({roomId, onClick}: { roomId: number, onClick: (event: number) => void }) {
+    const room = useOneRoom(roomId)
+
+    const handleClick = useCallback(() => {
+        onClick(roomId)
+    }, [roomId])
+
     return (
-        <li>
-            <Link to={`/chat/${user.id}`}>
-                {user.username}
-            </Link>
-        </li>
+        <>
+            {
+                room
+                    ? <ListItemButton onClick={handleClick}>
+                        <ListItemIcon>
+                            {
+                                room.type === "group"
+                                    ? <MailIcon/>
+                                    : room.type === "channel"
+                                        ? <InboxIcon/>
+                                        : <AccountBox/>
+                            }
+                        </ListItemIcon>
+                        <ListItemText primary={room.title}/>
+                    </ListItemButton>
+                    : <Skeleton variant="text"/>
+            }
+        </>
     )
 }

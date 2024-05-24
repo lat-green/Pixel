@@ -37,6 +37,7 @@
         <module>AuthorizationServer</module>
         <module>ChatServer</module>
         <module>ServerUtil</module>
+        <module>ClientSupportServer</module>
     </modules>
 
     <dependencyManagement>

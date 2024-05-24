@@ -1,19 +1,19 @@
-'use server'
+import {AUTH_TOKEN_URI, AUTH_URI, CLIENT_URI} from "./FetchUtil";
+import {TAuthConfig, TRefreshTokenExpiredEvent} from "react-oauth2-code-pkce";
 
-import {AUTH_URI, SERVER_IP} from "./DataUtil";
+export const authConfig: TAuthConfig = {
+    clientId: 'test-client',
 
-interface Tokens {
-    access_token: string,
-    refresh_token: string,
-    token_type: string,
-}
+    authorizationEndpoint: `${AUTH_URI}/oauth2/authorize`,
+    tokenEndpoint: `${AUTH_TOKEN_URI}/token`,
 
-export async function getTokens(code: string): Promise<Tokens> {
+    redirectUri: `${CLIENT_URI}/auth/code`,
+    scope: 'profile.write chat.write openid',
+    onRefreshTokenExpire: (event: TRefreshTokenExpiredEvent) => window.confirm('Session expired. Refresh page to continue using the site?') && event.logIn(),
 
-    return fetch(`${AUTH_URI}/oauth2/token?grant_type=authorization_code&code=${code}&redirect_uri=http://${SERVER_IP}:3000/auth/code`, {
-        method: 'POST',
-        headers: {
-            'Authorization': "Basic dGVzdC1jbGllbnQ6dGVzdC1jbGllbnQ="
-        }
-    }).then(resp => resp.json());
+    logoutRedirect: '/',
+    storage: 'local',
+
+
+    logoutEndpoint: '/',
 }

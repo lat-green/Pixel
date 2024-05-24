@@ -1,6 +1,7 @@
 package com.example.pixel.server.chat.controller;
 
-import com.example.pixel.server.chat.entity.ChatUser;
+import com.example.pixel.server.chat.controller.securiry.HasScopeProfileRead;
+import com.example.pixel.server.chat.entity.Customer;
 import com.example.pixel.server.chat.serializer.ChatUserAttachmentToUserSerializer;
 import com.example.pixel.server.chat.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -26,23 +27,25 @@ public class UserController {
         this.objectMapper = new ObjectMapper().registerModule(new SimpleModule().addSerializer(serializer));
     }
 
+    @HasScopeProfileRead
     @GetMapping("/me")
-    public ChatUser getMe(ChatUser user) {
+    public Customer getMe(Customer user) {
         return user;
     }
 
+    @HasScopeProfileRead
     @GetMapping("/me/chats")
-    public String getMeChats(ChatUser user) throws JsonProcessingException {
-        return objectMapper.writeValueAsString(user.getChats());
+    public String getMeChats(Customer user) throws JsonProcessingException {
+        return objectMapper.writeValueAsString(user.getChats().stream().map(x -> x.getChatRoom().getId()).toList());
     }
 
     @GetMapping("/{id}")
-    public ChatUser getOneUser(@PathVariable long id) {
+    public Customer getOneUser(@PathVariable long id) {
         return userService.getOneUser(id);
     }
 
     @GetMapping("")
-    public Collection<ChatUser> getAllUsers() {
+    public Collection<Customer> getAllUsers() {
         return userService.getAllUsers();
     }
 

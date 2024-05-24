@@ -1,6 +1,7 @@
 package com.example.pixel.server.chat.entity.attachment;
 
-import com.example.pixel.server.chat.entity.ChatUser;
+import com.example.pixel.server.chat.entity.Customer;
+import com.example.pixel.server.chat.entity.chat.Chat;
 import com.example.pixel.server.util.entity.BaseEntity;
 import com.example.pixel.server.util.entity.EntityAsIdOnlySerializer;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -12,11 +13,11 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-@Entity(name = "chat_user_attachment")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity(name = "chat_user_attachment")
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class ChatUserAttachment implements BaseEntity {
 
@@ -27,6 +28,8 @@ public abstract class ChatUserAttachment implements BaseEntity {
     @JsonSerialize(using = EntityAsIdOnlySerializer.class)
     @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private ChatUser user;
+    private Customer user;
+
+    public abstract Chat getChatRoom();
 
 }

@@ -35,15 +35,18 @@ public class AuthRedirectUri implements BaseEntity, BaseNameEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        return result;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        AuthRedirectUri other = (AuthRedirectUri) o;
-        return Objects.equals(id, other.id);
+        AuthRedirectUri that = (AuthRedirectUri) o;
+        if (id != that.id) return false;
+        return Objects.equals(name, that.name);
     }
 
     @Override

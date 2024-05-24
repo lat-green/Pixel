@@ -1,11 +1,10 @@
 package com.example.pixel.server.authorization.entity;
 
 import com.example.pixel.server.util.entity.BaseEntity;
+import com.example.pixel.server.util.entity.EntityAsNameOnlySerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,9 +12,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Entity(name = "customer")
 @Data
@@ -34,6 +31,13 @@ public class AuthUser implements BaseEntity, UserDetails {
     @JsonIgnore
     @Column(nullable = false)
     private String password;
+
+    @Column(name = "created_date", nullable = false, updatable = false)
+    private Date createdDate = new Date();
+
+    @JsonSerialize(using = EntityAsNameOnlySerializer.class)
+    @OneToMany(mappedBy = "owner", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH}, orphanRemoval = true)
+    private Set<AuthClient> clients;
 
     @JsonIgnore
     @Override

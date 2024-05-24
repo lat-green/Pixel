@@ -34,32 +34,42 @@ public class RepositoryConfiguration {
     @Transactional
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
-        final var testScope = clientScopeRepository.findByName("test").orElseGet(() -> {
-            var m = new AuthClientScope();
-            m.setName("test");
-            return clientScopeRepository.save(m);
-        });
+        final var readScope = createScope("chat.read");
+        final var writeScope = createScope("chat.write");
+        final var profileReadScope = createScope("profile.read");
+        final var profileWriteScope = createScope("profile.write");
+        final var openidScope = createScope("openid");
+        final var arseny = createUser("Arseny");
+        final var maksim = createUser("Maksim");
+        createUser("Ангелина");
+        createUser("Света");
         final var testClient = clientRepository.findByClientId("test-client").orElseGet(() -> {
             var m = new AuthClient();
+            m.setOwner(arseny);
             m.setClientName("Test Client");
             m.setClientId("test-client");
             m.setClientSecret(passwordEncoder.encode("test-client"));
-            m.setScopes(Set.of(testScope));
-            var postmanCallback = new AuthRedirectUri();
-            postmanCallback.setName("https://oauth.pstmn.io/v1/browser-callback");
-            postmanCallback.setClient(m);
-            m.setRedirectUris(Set.of(postmanCallback));
+            m.setScopes(Set.of(readScope, writeScope, profileReadScope, profileWriteScope, openidScope));
+            m.setRedirectUris(Set.of(
+                    AuthRedirectUri.builder().name("https://oauth.pstmn.io/v1/browser-callback").client(m).build(),
+                    AuthRedirectUri.builder().name("http://localhost:3000/auth/code").client(m).build()
+            ));
             return clientRepository.save(m);
         });
-        final var arseny = userRepository.findByUsername("Arseny").orElseGet(() -> {
-            var m = new AuthUser();
-            m.setUsername("Arseny");
-            m.setPassword(passwordEncoder.encode("1234"));
-            return userRepository.save(m);
+    }
+
+    private AuthClientScope createScope(String name) {
+        return clientScopeRepository.findByName(name).orElseGet(() -> {
+            var m = new AuthClientScope();
+            m.setName(name);
+            return clientScopeRepository.save(m);
         });
-        final var maksim = userRepository.findByUsername("Maksim").orElseGet(() -> {
+    }
+
+    private AuthUser createUser(String name) {
+        return userRepository.findByUsername(name).orElseGet(() -> {
             var m = new AuthUser();
-            m.setUsername("Maksim");
+            m.setUsername(name);
             m.setPassword(passwordEncoder.encode("1234"));
             return userRepository.save(m);
         });
