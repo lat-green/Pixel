@@ -13,7 +13,7 @@ import lombok.*;
 @Entity(name = "chat_text_message")
 public class TextMessage extends Message {
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 4 * 1024)
     private String content;
 
     @JsonProperty("type")

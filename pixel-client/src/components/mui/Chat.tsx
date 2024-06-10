@@ -28,6 +28,10 @@ export function Chat({chatId}: { chatId: number }) {
 
     const [messages, setMessages] = useState<MessageInfo[]>([])
 
+    useEffect(() => {
+        setMessages([]);
+    }, [chatId]);
+
     const addLocalMessage = (msg: MessageInfo) => {
         setMessages(messages => [
             ...messages,
@@ -52,12 +56,8 @@ export function Chat({chatId}: { chatId: number }) {
     if (!chat)
         return (<Skeleton/>)
 
-    console.log('messages', messages)
-
     const sendMessage = (msg: string) => {
         if (msg.trim() !== "") {
-            // stompClient.send("/app/chat", {}, JSON.stringify(message));
-
             if (chat)
                 createTextMessage(chat.id, {
                     content: msg,
@@ -117,7 +117,14 @@ export function Chat({chatId}: { chatId: number }) {
                                  style={{
                                      display: 'flex'
                                  }}>
-                                <ChatMessage message={message} currentUserId={me.id}/>
+                                {
+                                    message.user === me.id
+                                        ? <ChatMeMessage message={message}/>
+                                        : chat.type === "contact"
+                                            ? <ChatContactMessage message={message}/>
+                                            : <ChatMessage message={message}/>
+                                }
+
                             </div>
                         )
                         : null
@@ -132,7 +139,7 @@ export function Chat({chatId}: { chatId: number }) {
                     }}>
                         <textarea
                             name="user_input"
-                            placeholder="Write your message..."
+                            placeholder="Напишите свое сообщение..."
                             value={text}
                             onChange={(event) => setText(event.target.value)}
                             onKeyPress={(event) => {
@@ -198,19 +205,7 @@ function ChatUsers({
     )
 }
 
-function ChatMessage({message, currentUserId}: { message: MessageInfo, currentUserId: number }) {
-    if (currentUserId === message.user)
-        return (
-            <ListItem style={{
-                textAlign: 'right'
-            }}>
-                <UserIdInfo id={message.user}>
-                    <ListItemText primary={message.content}
-                                  secondary={date_TO_String(message.sendTime)}/>
-                </UserIdInfo>
-            </ListItem>
-        );
-
+function ChatMessage({message}: { message: MessageInfo }) {
     return (
         <ListItem>
             <UserIdInfo id={message.user}>
@@ -224,8 +219,31 @@ function ChatMessage({message, currentUserId}: { message: MessageInfo, currentUs
     );
 }
 
+function ChatContactMessage({message}: { message: MessageInfo }) {
+    return (
+        <ListItem>
+            <ListItemText primary={message.content}
+                          secondary={date_TO_String(message.sendTime)}/>
+        </ListItem>
+    );
+}
+
+function ChatMeMessage({message}: { message: MessageInfo }) {
+    return (
+        <ListItem style={{
+            textAlign: 'right'
+        }}>
+            <ListItemText primary={message.content}
+                          secondary={date_TO_String(message.sendTime)}/>
+        </ListItem>
+    );
+
+}
+
 function date_TO_String(date_Object: Date) {
     const h = date_Object.getHours()
     const m = date_Object.getMinutes()
+    if (m < 10)
+        return `${h}:0${m}`;
     return `${h}:${m}`;
 }

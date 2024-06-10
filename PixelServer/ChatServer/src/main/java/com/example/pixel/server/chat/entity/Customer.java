@@ -33,7 +33,7 @@ public class Customer implements BaseEntity {
     @Column(name = "created_date", nullable = false, updatable = false)
     private Date createdDate;
 
-    @Column(name = "avatar", length = 1024 * 10)
+    @Column(length = 1024 * 10)
     private String avatar;
 
     @Override

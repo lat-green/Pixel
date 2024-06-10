@@ -43,6 +43,8 @@ public class RepositoryConfiguration {
         final var maksim = createUser("Maksim");
         createUser("Ангелина");
         createUser("Света");
+        createUser("Никита");
+        createUser("Татьяна Василевна");
         final var testClient = clientRepository.findByClientId("test-client").orElseGet(() -> {
             var m = new AuthClient();
             m.setOwner(arseny);

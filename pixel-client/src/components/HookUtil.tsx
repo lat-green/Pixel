@@ -35,4 +35,21 @@ export function useMeUser() {
     return useFetch(getMeUser, [])
 }
 
+export function useRecipientUser(roomId: number) {
+    const me = useMeUser()
+    const users = useRoomUsers(roomId)
 
+    if (!me)
+        return me
+    if (!users)
+        return users
+
+    console.log('users', users)
+
+    const notMe = users.filter(x => x.user != me.id)
+
+    if (notMe.length === 0)
+        return undefined
+
+    return notMe[0].user
+}

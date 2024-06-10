@@ -13,7 +13,15 @@ export interface GroupRoom extends RoomRaw {
     type: "group"
 }
 
-export type Room = GroupRoom
+export interface ChannelRoom extends RoomRaw {
+    type: "channel"
+}
+
+export interface ContactRoom extends RoomRaw {
+    type: "contact"
+}
+
+export type Room = GroupRoom | ChannelRoom | ContactRoom
 
 interface UserRoleAttachmentRaw {
     user: number,
