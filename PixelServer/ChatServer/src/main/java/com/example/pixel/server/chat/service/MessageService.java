@@ -45,4 +45,8 @@ public class MessageService {
         return repository.findAllByChat(room);
     }
 
+    public void deleteOneMessage(long id) {
+        repository.deleteById(id);
+    }
+
 }

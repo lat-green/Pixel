@@ -28,6 +28,12 @@ export async function getOneMessage(messageId: number): Promise<MessageInfo> {
     return sfetch(`${CHAT_URI}/messages/${messageId}`).then(resp => resp.json()).then(toMessage);
 }
 
+export async function deleteOneMessage(messageId: number) {
+    return sfetch(`${CHAT_URI}/messages/${messageId}`, {
+        method: 'DELETE',
+    });
+}
+
 export async function createTextMessage(roomId: number, request: TextMessageCreateRequest): Promise<MessageInfo> {
     return sfetch(`${CHAT_URI}/rooms/${roomId}/messages/text`, {
         method: 'POST',

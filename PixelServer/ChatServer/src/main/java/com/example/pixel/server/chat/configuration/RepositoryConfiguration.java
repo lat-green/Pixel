@@ -45,7 +45,6 @@ public class RepositoryConfiguration {
         var u3 = userRepository.findByUsername("Никита").orElseThrow();
         var u4 = userRepository.findByUsername("Татьяна Василевна").orElseThrow();
         var g1 = createContact(u1, u2);
-        createTextMessage(u1, g1, "Привет, Ангелина!");
         createTextMessage(u2, g1, "Привет, Света! Ты не знаешь, что нам задали по литературе на завтра?");
         createTextMessage(u1, g1, "Знаю: нужно написать сочинение.");
         createTextMessage(u2, g1, "На какую тему?");
@@ -113,7 +112,7 @@ public class RepositoryConfiguration {
     private TextMessage createTextMessage(Customer user, Chat room, String content) {
         return textMessageRepository.findByChatAndUserAndContent(room, user, content).orElseGet(() -> {
             try {
-                sleep(1000);
+                sleep(2000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

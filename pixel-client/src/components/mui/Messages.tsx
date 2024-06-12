@@ -1,10 +1,12 @@
 import {useMap, useMeUser, useOneRoom} from "../HookUtil";
 import * as React from "react";
 import {useEffect, useMemo, useState} from "react";
-import {getOneMessage, MessageInfo} from "../../api/data/Message";
-import {List, ListItem, ListItemAvatar, ListItemText} from "@mui/material";
+import {deleteOneMessage, getOneMessage, MessageInfo} from "../../api/data/Message";
+import {Button, List, ListItem, ListItemAvatar, ListItemText} from "@mui/material";
 import {UserAvatar, UserIdInfo, UserName} from "../user/User";
 import {Room} from "../../api/data/Room";
+import {CustomMenuContainer} from "../CustomMenu";
+import {ContextMenu} from "../styles/styles";
 
 
 interface Props {
@@ -23,7 +25,7 @@ export function useMessages(chat: Room | undefined) {
 
     useEffect(() => {
         setMessages([])
-    }, [chat]);
+    }, [chat?.id]);
 
     useEffect(() => {
         if (chat)
@@ -32,7 +34,7 @@ export function useMessages(chat: Room | undefined) {
                     addElement(message)
                 })
             }
-    }, [chat]);
+    }, [chat?.id]);
 
     return messages
 }
@@ -58,7 +60,7 @@ export function Messages({chatId}: Props) {
                 if (date != lastDate) {
                     lastDate = date
                     const component = (
-                        <CenterMarker text={getDayFromDate(message.sendTime)}/>
+                        <CenterMarker key={-message.id} text={getDayFromDate(message.sendTime)}/>
                     )
                     messageComponents.push(component)
                 }
@@ -110,6 +112,7 @@ function CenterMarker({text}: { text: string | number }) {
             width: '100px',
             height: '20px',
             borderRadius: '100px',
+            position: 'sticky',
             fontSize: 8,
         }}>
             <ListItemText primary={text}/>
@@ -141,12 +144,39 @@ function ChatContactMessage({message}: { message: MessageInfo }) {
 }
 
 function ChatMeMessage({message}: { message: MessageInfo }) {
+
+    function editMessage() {
+        console.log("edit")
+    }
+
+    function deleteMessage() {
+        deleteOneMessage(message.id)
+    }
+
     return (
-        <ListItem style={{
-            textAlign: 'right'
-        }}>
-            <ListItemText primary={message.content}
-                          secondary={getTimeFromDate(message.sendTime)}/>
+        <ListItem
+        >
+            <ListItemText
+                style={{
+                    textAlign: 'right'
+                }}
+                primary={
+                    <CustomMenuContainer contextMenu={
+                        <ContextMenu
+                            style={{
+                                textAlign: 'right'
+                            }}>
+                            {/*<Button variant="text" onClick={editMessage}>Edit</Button>*/}
+                            <Button color='error' variant="text" onClick={deleteMessage}>Delete</Button>
+                        </ContextMenu>
+                    }>
+                        <div
+                        >
+                            {message.content}
+                        </div>
+                    </CustomMenuContainer>
+                }
+                secondary={getTimeFromDate(message.sendTime)}/>
         </ListItem>
     );
 
@@ -156,9 +186,9 @@ function getAbsoluteDay(date: Date) {
     return Math.ceil(date.getTime() / 86400000)
 }
 
-function getDayFromDate(date_Object: Date) {
-    const m = date_Object.getMonth()
-    const d = date_Object.getDay()
+function getDayFromDate(date: Date) {
+    const d = date.getUTCDate()
+    const m = date.getUTCMonth() + 1
     if (m < 10)
         return `${d}.0${m}`;
     return `${d}.${m}`;
