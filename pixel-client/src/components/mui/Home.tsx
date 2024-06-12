@@ -8,6 +8,7 @@ import {Contacts} from "../Contacts";
 import Typography from "@mui/material/Typography";
 import AppBar from "@mui/material/AppBar";
 import {UserMeInfo, UserName} from "../user/User";
+import {Profile} from "./Profile";
 
 const drawerWidth = 240;
 
@@ -16,6 +17,16 @@ export default function Home() {
     const choiceChat = useCallback((event: number) => {
         setChatId(event)
     }, [setChatId])
+
+    const [open, setOpen] = React.useState(false);
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+    const handleClose = () => {
+        setOpen(false);
+    };
+
     return (
         <Box sx={{display: 'grid'}}>
             <AppBar sx={{zIndex: (theme) => theme.zIndex.drawer + 1}}>
@@ -24,7 +35,7 @@ export default function Home() {
                         Pixel
                     </Typography>
                     <UserMeInfo>
-                        <Button color="inherit"><UserName/></Button>
+                        <Button color="inherit" onClick={handleClickOpen}><UserName/></Button>
                     </UserMeInfo>
                 </Toolbar>
             </AppBar>
@@ -47,6 +58,7 @@ export default function Home() {
                     {chatId ? <Chat chatId={chatId}/> : null}
                 </Box>
             </Box>
+            <Profile open={open} handleClose={handleClose}/>
         </Box>
     );
 }

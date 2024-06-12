@@ -1,5 +1,6 @@
 package com.example.pixel.server.chat.service;
 
+import com.example.pixel.server.chat.dto.user.CustomerReplaceRequest;
 import com.example.pixel.server.chat.entity.Customer;
 import com.example.pixel.server.chat.repository.UserRepository;
 import com.example.pixel.server.util.controller.advice.exception.UserNotFoundException;
@@ -25,6 +26,16 @@ public class UserService {
     public Customer getOneUser(long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
+    }
+
+    public Customer replaceUser(Customer customer, CustomerReplaceRequest replaceRequest) {
+        var name = replaceRequest.getUsername();
+        if (name != null)
+            customer.setUsername(name);
+        var avatar = replaceRequest.getAvatar();
+        if (avatar != null)
+            customer.setAvatar(avatar);
+        return repository.save(customer);
     }
 
 }

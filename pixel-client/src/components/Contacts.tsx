@@ -1,13 +1,13 @@
 import React, {useCallback} from "react";
-import {Avatar, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Skeleton} from "@mui/material";
-import {useFetch, useOneRoom, useRecipientUser} from "./HookUtil";
+import {List, ListItem, ListItemButton, ListItemIcon, ListItemText, Skeleton} from "@mui/material";
+import {useAsync, useOneRoom, useRecipientUser} from "./HookUtil";
 import {getMeChats} from "../api/data/User";
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import {UserAvatar, UserIdInfo, UserName} from "./user/User";
 
 export function Contacts({onClick}: { onClick: (event: number) => void }) {
-    const rooms = useFetch(getMeChats, [])
+    const rooms = useAsync(getMeChats, [])
 
     if (!rooms)
         return (<Skeleton/>)

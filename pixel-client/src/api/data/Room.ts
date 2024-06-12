@@ -77,3 +77,11 @@ export async function createGroupRoom(request: GroupRoomCreateRequest): Promise<
         }
     }).then(resp => resp.json());
 }
+
+export async function joinRoom(chatId: number) {
+    return sfetch(`${CHAT_URI}/rooms/${chatId}/join`);
+}
+
+export async function leaveRoom(chatId: number) {
+    return sfetch(`${CHAT_URI}/rooms/${chatId}/leave`);
+}

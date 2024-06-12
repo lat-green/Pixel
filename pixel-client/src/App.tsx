@@ -1,12 +1,10 @@
 import React, {useContext, useEffect} from 'react';
 import {Route, Routes} from "react-router-dom";
 import {Paper, Skeleton, styled} from "@mui/material";
-import Chat from "./components/Chat";
 import {UserMeInfo} from "./components/user/User";
 import {AuthContext} from "react-oauth2-code-pkce";
 
 import './App.css'
-import {Profile} from "./components/Profile";
 import Home from "./components/mui/Home";
 
 const Item = styled(Paper)(({theme}) => ({
@@ -46,8 +44,6 @@ export default function App() {
             <Route path="/auth/code" element={<AuthCode/>}/>
             <Route path="/auth/signin" element={<AuthSignIn/>}/>
             <Route path="/" element={<UserMeInfo><Home/></UserMeInfo>}/>
-            <Route path="/profile" element={<UserMeInfo><Profile/></UserMeInfo>}/>
-            <Route path="/chat/:id" element={<UserMeInfo><Chat/></UserMeInfo>}/>
         </Routes>
     );
 }

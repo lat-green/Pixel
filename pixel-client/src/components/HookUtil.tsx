@@ -1,9 +1,9 @@
-import {DependencyList, useEffect, useState} from "react";
-import {getOneRoom, getRoomUsers} from "../api/data/Room";
+import {DependencyList, useEffect, useMemo, useState} from "react";
+import {getOneRoom, getRoomUsers, Room} from "../api/data/Room";
 import {getMeUser, getOneUser} from "../api/data/User";
 import {getOneMessage} from "../api/data/Message";
 
-export function useFetch<T>(func: () => Promise<T>, deps?: DependencyList): T | undefined {
+export function useAsync<T>(func: () => Promise<T>, deps?: DependencyList): T | undefined {
     const [result, setResult] = useState<T>()
 
     useEffect(() => {
@@ -16,23 +16,23 @@ export function useFetch<T>(func: () => Promise<T>, deps?: DependencyList): T | 
 }
 
 export function useOneRoom(roomId: number) {
-    return useFetch(() => getOneRoom(roomId), [roomId])
+    return useAsync(() => getOneRoom(roomId), [roomId])
 }
 
 export function useOneUser(userId: number) {
-    return useFetch(() => getOneUser(userId), [userId])
+    return useAsync(() => getOneUser(userId), [userId])
 }
 
 export function useOneMessage(messageId: number) {
-    return useFetch(() => getOneMessage(messageId), [messageId])
+    return useAsync(() => getOneMessage(messageId), [messageId])
 }
 
 export function useRoomUsers(chatId: number) {
-    return useFetch(() => getRoomUsers(chatId), [chatId])
+    return useAsync(() => getRoomUsers(chatId), [chatId])
 }
 
 export function useMeUser() {
-    return useFetch(getMeUser, [])
+    return useAsync(getMeUser, [])
 }
 
 export function useRecipientUser(roomId: number) {
@@ -44,12 +44,27 @@ export function useRecipientUser(roomId: number) {
     if (!users)
         return users
 
-    console.log('users', users)
-
     const notMe = users.filter(x => x.user != me.id)
 
     if (notMe.length === 0)
         return undefined
 
     return notMe[0].user
+}
+
+export function useChatTitle(chat: Room | undefined) {
+    const me = useMeUser()
+    if (!chat || !me)
+        return undefined
+    if (chat.type === "contact")
+        return chat.title.replace(me.username, '').trim()
+    return chat.title
+}
+
+export function useMapCallback<T, V, E>(value: V, func: (e: V) => ((e: E) => T)) {
+    return useMemo(() => func(value), [value])
+}
+
+export function useMap<V, R>(value: V, func: (e: V) => R) {
+    return useMemo(() => func(value), [value])
 }

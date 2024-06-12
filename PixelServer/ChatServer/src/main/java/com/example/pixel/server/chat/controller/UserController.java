@@ -1,16 +1,15 @@
 package com.example.pixel.server.chat.controller;
 
 import com.example.pixel.server.chat.controller.securiry.HasScopeProfileRead;
+import com.example.pixel.server.chat.controller.securiry.HasScopeProfileWrite;
+import com.example.pixel.server.chat.dto.user.CustomerReplaceRequest;
 import com.example.pixel.server.chat.entity.Customer;
 import com.example.pixel.server.chat.serializer.ChatUserAttachmentToUserSerializer;
 import com.example.pixel.server.chat.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
@@ -47,6 +46,12 @@ public class UserController {
     @GetMapping("")
     public Collection<Customer> getAllUsers() {
         return userService.getAllUsers();
+    }
+
+    @HasScopeProfileWrite
+    @PutMapping("")
+    public Customer replaceUser(Customer user, @RequestBody CustomerReplaceRequest replaceRequest) throws JsonProcessingException {
+        return userService.replaceUser(user, replaceRequest);
     }
 
 }
