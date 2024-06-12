@@ -14,16 +14,9 @@ export async function ffetch(path, init) {
         init.headers = {}
     if ((init.method === 'POST' || init.method === 'PUT') && !init.headers["Content-Type"])
         init.headers["Content-Type"] = "application/json"
-    const resp = await fetch(path, init).catch(e => {
+    return fetch(path, init).catch(e => {
         throw new Error(`${e.message} on fetch ${path}`)
     })
-    if (resp.ok)
-        return resp
-    if (resp.status === 401 || resp.status === 403) {
-        window.location.href = '/auth/signin'
-        return Promise.reject(`resp.status === ${resp.status}`)
-    }
-    return resp
 }
 
 export async function sfetch(path, init) {
@@ -40,5 +33,12 @@ export async function sfetch(path, init) {
             return Promise.reject(`have not access token`)
         }
     }
-    return ffetch(path, init)
+    const resp = await ffetch(path, init)
+    if (resp.ok)
+        return resp
+    if (resp.status === 401 || resp.status === 403) {
+        window.location.href = '/auth/signin'
+        return Promise.reject(`resp.status === ${resp.status}`)
+    }
+    return resp
 }

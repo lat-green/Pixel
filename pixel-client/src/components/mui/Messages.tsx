@@ -7,6 +7,7 @@ import {UserAvatar, UserIdInfo, UserName} from "../user/User";
 import {Room} from "../../api/data/Room";
 import {CustomMenuContainer} from "../CustomMenu";
 import {ContextMenu} from "../styles/styles";
+import {useSubscription} from "react-stomp-hooks";
 
 
 interface Props {
@@ -35,6 +36,20 @@ export function useMessages(chat: Room | undefined) {
                 })
             }
     }, [chat?.id]);
+
+    useSubscription("/user/" + chat?.id + "/create", (message) => {
+        const {messageId} = JSON.parse(message.body)
+        getOneMessage(messageId).then((message) => {
+            addElement(message)
+        })
+    });
+
+    useSubscription("/user/" + chat?.id + "/delete", (message) => {
+        const {messageId} = JSON.parse(message.body)
+        setMessages(currentArray => [
+            ...currentArray
+        ].filter(m => m.id != messageId))
+    });
 
     return messages
 }
@@ -194,9 +209,9 @@ function getDayFromDate(date: Date) {
     return `${d}.${m}`;
 }
 
-function getTimeFromDate(date_Object: Date) {
-    const h = date_Object.getHours()
-    const m = date_Object.getMinutes()
+function getTimeFromDate(date: Date) {
+    const h = date.getHours()
+    const m = date.getMinutes()
     if (m < 10)
         return `${h}:0${m}`;
     return `${h}:${m}`;

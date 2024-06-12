@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from 'react';
+import React, {useContext} from 'react';
 import {Route, Routes} from "react-router-dom";
 import {Paper, Skeleton, styled} from "@mui/material";
 import {UserMeInfo} from "./components/user/User";
@@ -21,10 +21,10 @@ function AuthCode(): JSX.Element | null {
 }
 
 function AuthSignIn(): JSX.Element | null {
-    const context = useContext(AuthContext)
-    useEffect(() => {
-        context.logIn()
-    }, []);
+    // const context = useContext(AuthContext)
+    // useEffect(() => {
+    //     context.logIn()
+    // }, []);
     return null
 }
 

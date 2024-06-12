@@ -5,15 +5,20 @@ import reportWebVitals from './reportWebVitals';
 import {BrowserRouter} from "react-router-dom";
 import {AuthProvider} from "react-oauth2-code-pkce";
 import {authConfig} from "./api/ServerAuthUtil";
+import {StompSessionProvider} from "react-stomp-hooks";
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
 );
 root.render(
     <BrowserRouter>
-        <AuthProvider authConfig={authConfig}>
-            <App/>
-        </AuthProvider>
+        <StompSessionProvider
+            url={"http://localhost:3032/ws"}
+        >
+            <AuthProvider authConfig={authConfig}>
+                <App/>
+            </AuthProvider>
+        </StompSessionProvider>
     </BrowserRouter>
 );
 

@@ -1,5 +1,6 @@
 package com.example.pixel.server.chat.controller.advice;
 
+import com.example.pixel.server.util.controller.advice.InfoExceptionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

@@ -16,8 +16,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 
@@ -38,7 +38,7 @@ public class RepositoryConfiguration {
 
     @Transactional
     @EventListener(ApplicationReadyEvent.class)
-    public void init() throws MalformedURLException, InterruptedException {
+    public void init() {
         updateUsersCreateDate();
         var u1 = userRepository.findByUsername("Света").orElseThrow();
         var u2 = userRepository.findByUsername("Ангелина").orElseThrow();
@@ -120,6 +120,8 @@ public class RepositoryConfiguration {
             message.setContent(content);
             message.setUser(user);
             message.setChat(room);
+            message.getSendTime().setMonth(Calendar.MAY);
+            message.getSendTime().setHours(13);
             return textMessageRepository.save(message);
         });
     }

@@ -36,13 +36,7 @@ public class SecurityConfig {
         config.setAllowCredentials(false);
         config.addAllowedOrigin("*");
         config.addAllowedHeader("*");
-        config.addAllowedMethod("OPTIONS");
-        config.addAllowedMethod("HEAD");
-        config.addAllowedMethod("GET");
-        config.addAllowedMethod("PUT");
-        config.addAllowedMethod("POST");
-        config.addAllowedMethod("DELETE");
-        config.addAllowedMethod("PATCH");
+        config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
@@ -75,6 +69,7 @@ public class SecurityConfig {
     @Order(2)
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http
+//                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests.anyRequest().authenticated()
                 )
@@ -91,7 +86,7 @@ public class SecurityConfig {
     @Bean
     TokenSettings tokenSettings() {
         return TokenSettings.builder()
-                .accessTokenTimeToLive(Duration.of(30, ChronoUnit.DAYS))
+                .accessTokenTimeToLive(Duration.of(30, ChronoUnit.MINUTES))
                 .refreshTokenTimeToLive(Duration.of(3, ChronoUnit.DAYS))
                 .authorizationCodeTimeToLive(Duration.of(30, ChronoUnit.MINUTES))
                 .build();
