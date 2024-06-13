@@ -1,8 +1,10 @@
 package com.example.pixel.server.chat.service;
 
+import com.example.pixel.server.chat.dto.message.ImageMessageCreateRequest;
 import com.example.pixel.server.chat.dto.message.MessageCreateNotification;
 import com.example.pixel.server.chat.dto.message.TextMessageCreateRequest;
 import com.example.pixel.server.chat.entity.Customer;
+import com.example.pixel.server.chat.entity.message.ImageMessage;
 import com.example.pixel.server.chat.entity.message.Message;
 import com.example.pixel.server.chat.entity.message.TextMessage;
 import com.example.pixel.server.chat.exception.MessageNotFoundException;
@@ -36,6 +38,20 @@ public class MessageService {
         message.setChat(roomRepository.getReferenceById(roomId));
         message.setUser(user);
         message.setContent(request.getContent());
+        message = repository.save(message);
+        messagingTemplate.convertAndSendToUser(
+                "" + roomId,
+                "/create",
+                new MessageCreateNotification(message.getId())
+        );
+        return message;
+    }
+
+    public Message createImageMessage(long roomId, Customer user, ImageMessageCreateRequest request) {
+        var message = new ImageMessage();
+        message.setChat(roomRepository.getReferenceById(roomId));
+        message.setUser(user);
+        message.setUrl(request.getUrl());
         message = repository.save(message);
         messagingTemplate.convertAndSendToUser(
                 "" + roomId,

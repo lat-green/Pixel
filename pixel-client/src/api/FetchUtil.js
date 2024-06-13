@@ -12,8 +12,8 @@ export async function ffetch(path, init) {
         init = {}
     if (!init.headers)
         init.headers = {}
-    if ((init.method === 'POST' || init.method === 'PUT') && !init.headers["Content-Type"])
-        init.headers["Content-Type"] = "application/json"
+    // if ((init.method === 'POST' || init.method === 'PUT') && !init.headers["Content-Type"])
+    //     init.headers["Content-Type"] = "application/json"
     return fetch(path, init).catch(e => {
         throw new Error(`${e.message} on fetch ${path}`)
     })

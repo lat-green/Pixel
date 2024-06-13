@@ -23,8 +23,11 @@ export interface ContactRoom extends RoomRaw {
 
 export type Room = GroupRoom | ChannelRoom | ContactRoom
 
+export type UserRoleAttachmentType = 'group' | 'channel' | 'contact'
+
 interface UserRoleAttachmentRaw {
     user: number,
+    type: UserRoleAttachmentType
 }
 
 export enum UserGroupRoleAttachmentRole {
@@ -34,6 +37,7 @@ export enum UserGroupRoleAttachmentRole {
 
 export interface UserGroupRoleAttachment extends UserRoleAttachmentRaw {
     role: UserGroupRoleAttachmentRole,
+    type: 'group'
 }
 
 export enum UserChanelRoleAttachmentRole {
@@ -45,9 +49,11 @@ export enum UserChanelRoleAttachmentRole {
 
 export interface UserChanelRoleAttachment extends UserRoleAttachmentRaw {
     role: UserChanelRoleAttachmentRole,
+    type: 'channel'
 }
 
 export interface UserContactRoleAttachment extends UserRoleAttachmentRaw {
+    type: 'contact'
 }
 
 export type UserRoleAttachment = UserGroupRoleAttachment | UserChanelRoleAttachment | UserContactRoleAttachment

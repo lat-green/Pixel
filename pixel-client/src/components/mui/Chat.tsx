@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useState} from 'react';
+import {SetStateAction, useState} from 'react';
 import Box from '@mui/material/Box';
 import AppBar from '@mui/material/AppBar';
 import Typography from '@mui/material/Typography';
@@ -15,20 +15,50 @@ import {
     Skeleton,
     Toolbar
 } from "@mui/material";
-import {useChatTitle, useOneRoom, useRoomUsers} from "../HookUtil";
+import {useAsync, useChatTitle, useMeUser, useOneRoom, useRoomUsers} from "../HookUtil";
 import {UserAvatar, UserIdInfo, UserName} from "../user/User";
-import {leaveRoom, UserChanelRoleAttachmentRole, UserRoleAttachment} from "../../api/data/Room";
+import {getRoomUsers, leaveRoom, Room, UserChanelRoleAttachmentRole, UserRoleAttachment} from "../../api/data/Room";
 import './Chat.css'
 import MenuIcon from '@mui/icons-material/Menu';
 import {Send} from '@mui/icons-material';
-import {createTextMessage} from "../../api/data/Message";
+import {createImageMessage, createTextMessage} from "../../api/data/Message";
 import {Messages} from "./Messages";
+import DragDrop from '../DragDrop';
+import {uploadFile} from "../../api/Files";
+import HideIf from "../HideIf";
+import {User} from "../../api/data/User";
+
+async function getCanWrite(room: Room | undefined, user: User | undefined) {
+    if (!room)
+        return false
+    if (!user)
+        return false
+    const attachment = await getAttachment(room, user)
+    if (attachment.type === 'channel') {
+        if (attachment.role === UserChanelRoleAttachmentRole.PRIVATE_USER || attachment.role === UserChanelRoleAttachmentRole.PUBLIC_USER) {
+            return false
+        }
+    }
+    return true
+}
+
+async function getAttachment(room: Room, user: User) {
+    const users = await getRoomUsers(room.id)
+    for (const attachment of users) {
+        if (attachment.user === user.id)
+            return attachment
+    }
+    throw new Error()
+}
 
 export function Chat({chatId}: { chatId: number }) {
     const [text, setText] = useState('')
     const chat = useOneRoom(chatId)
     const chatTitle = useChatTitle(chat)
+    const me = useMeUser()
     const [open, setOpen] = React.useState(false);
+    const [file, setFile] = useState<File>()
+    const canWrite = useAsync(() => getCanWrite(chat, me), [chat, me]) && true
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -39,6 +69,9 @@ export function Chat({chatId}: { chatId: number }) {
     };
 
     if (!chat)
+        return (<Skeleton/>)
+
+    if (!me)
         return (<Skeleton/>)
 
     const sendMessage = (msg: string) => {
@@ -56,6 +89,20 @@ export function Chat({chatId}: { chatId: number }) {
     function handleExit() {
         leaveRoom(chatId).then(() => {
         })
+    }
+
+    function handleChangeFile(file: SetStateAction<File>) {
+        setFile(file as SetStateAction<File | undefined>)
+    }
+
+    if (file) {
+        uploadFile(file).then(url => {
+            createImageMessage(chat.id, {
+                url: url
+            }).then(message => {
+            })
+        })
+        setFile(undefined)
     }
 
     return (
@@ -96,42 +143,46 @@ export function Chat({chatId}: { chatId: number }) {
                 </Box>
             </Drawer>
             <Messages chatId={chatId}/>
-            <AppBar position="sticky" color='inherit'
-                    sx={{bottom: '0px', zIndex: (theme) => theme.zIndex.drawer - 1}}>
-                <Toolbar>
-                    <Typography variant="h6" component="div" sx={{
-                        flexGrow: 1,
-                    }}>
-                        <textarea
-                            name="user_input"
-                            placeholder="Напишите свое сообщение..."
-                            value={text}
-                            onChange={(event) => setText(event.target.value)}
-                            onKeyPress={(event) => {
-                                if (event.key === 'Enter')
-                                    sendMessage(text);
+            <HideIf hide={!canWrite}>
+                <AppBar position="sticky" color='inherit'
+                        sx={{bottom: '0px', zIndex: (theme) => theme.zIndex.drawer - 1}}>
+                    <Toolbar>
+                        <Typography variant="h6" component="div" sx={{
+                            flexGrow: 1,
+                        }}>
+                            <DragDrop handleChangeFile={handleChangeFile}>
+                                <textarea
+                                    name="user_input"
+                                    placeholder="Напишите свое сообщение..."
+                                    value={text}
+                                    onChange={(event) => setText(event.target.value)}
+                                    onKeyPress={(event) => {
+                                        if (event.key === 'Enter')
+                                            sendMessage(text);
+                                    }}
+                                    style={{
+                                        border: 'none',
+                                        width: '100%',
+                                    }}
+                                />
+                            </DragDrop>
+                        </Typography>
+                        <IconButton
+                            color="primary"
+                            aria-label="send message"
+                            onClick={() => {
+                                sendMessage(text);
                             }}
-                            style={{
-                                border: 'none',
-                                width: '100%',
+                            edge="start"
+                            sx={{
+                                ml: 2,
                             }}
-                        />
-                    </Typography>
-                    <IconButton
-                        color="primary"
-                        aria-label="send message"
-                        onClick={() => {
-                            sendMessage(text);
-                        }}
-                        edge="start"
-                        sx={{
-                            ml: 2,
-                        }}
-                    >
-                        <Send/>
-                    </IconButton>
-                </Toolbar>
-            </AppBar>
+                        >
+                            <Send/>
+                        </IconButton>
+                    </Toolbar>
+                </AppBar>
+            </HideIf>
         </Box>
     );
 }

@@ -29,6 +29,7 @@ public class ChatUserAttachmentToRoomSerializer extends StdSerializer<ChatUserAt
             generator.writeStartObject();
             generator.writeNumberField("user", e.getUser().getId());
             generator.writeStringField("role", e.getRole().name());
+            generator.writeStringField("type", "group");
             generator.writeEndObject();
             return;
         }
@@ -36,12 +37,14 @@ public class ChatUserAttachmentToRoomSerializer extends StdSerializer<ChatUserAt
             generator.writeStartObject();
             generator.writeNumberField("user", e.getUser().getId());
             generator.writeStringField("role", e.getRole().name());
+            generator.writeStringField("type", "channel");
             generator.writeEndObject();
             return;
         }
         if (entity instanceof ChatContactUserAttachment e) {
             generator.writeStartObject();
             generator.writeNumberField("user", e.getUser().getId());
+            generator.writeStringField("type", "contact");
             generator.writeEndObject();
             return;
         }

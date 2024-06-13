@@ -1,7 +1,7 @@
 import {CHAT_URI, sfetch} from "../FetchUtil";
 
 
-export type MessageInfoType = "text"
+export type MessageInfoType = "text" | "image"
 
 interface MessageInfoRaw {
     id: number,
@@ -18,10 +18,19 @@ export interface TextMessageInfo extends MessageInfoRaw {
     type: "text",
 }
 
-export type MessageInfo = TextMessageInfo
+export interface ImageMessageInfo extends MessageInfoRaw {
+    url: string,
+    type: "image",
+}
+
+export type MessageInfo = TextMessageInfo | ImageMessageInfo
 
 export interface TextMessageCreateRequest {
     content: string,
+}
+
+export interface ImageMessageCreateRequest {
+    url: URL,
 }
 
 export async function getOneMessage(messageId: number): Promise<MessageInfo> {
@@ -36,6 +45,16 @@ export async function deleteOneMessage(messageId: number) {
 
 export async function createTextMessage(roomId: number, request: TextMessageCreateRequest): Promise<MessageInfo> {
     return sfetch(`${CHAT_URI}/rooms/${roomId}/messages/text`, {
+        method: 'POST',
+        body: JSON.stringify(request),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(resp => resp.json()).then(toMessage);
+}
+
+export async function createImageMessage(roomId: number, request: ImageMessageCreateRequest): Promise<MessageInfo> {
+    return sfetch(`${CHAT_URI}/rooms/${roomId}/messages/image`, {
         method: 'POST',
         body: JSON.stringify(request),
         headers: {

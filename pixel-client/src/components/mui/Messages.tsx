@@ -2,7 +2,7 @@ import {useMap, useMeUser, useOneRoom} from "../HookUtil";
 import * as React from "react";
 import {useEffect, useMemo, useState} from "react";
 import {deleteOneMessage, getOneMessage, MessageInfo} from "../../api/data/Message";
-import {Button, List, ListItem, ListItemAvatar, ListItemText} from "@mui/material";
+import {Button, List, ListItem, ListItemAvatar, ListItemText, Skeleton} from "@mui/material";
 import {UserAvatar, UserIdInfo, UserName} from "../user/User";
 import {Room} from "../../api/data/Room";
 import {CustomMenuContainer} from "../CustomMenu";
@@ -142,7 +142,7 @@ function ChatMessage({message}: { message: MessageInfo }) {
                 <ListItemAvatar>
                     <UserAvatar/>
                 </ListItemAvatar>
-                <ListItemText primary={message.content}
+                <ListItemText primary={(<MessageContent message={message}/>)}
                               secondary={<><UserName/> {getTimeFromDate(message.sendTime)}</>}/>
             </UserIdInfo>
         </ListItem>
@@ -152,7 +152,7 @@ function ChatMessage({message}: { message: MessageInfo }) {
 function ChatContactMessage({message}: { message: MessageInfo }) {
     return (
         <ListItem>
-            <ListItemText primary={message.content}
+            <ListItemText primary={(<MessageContent message={message}/>)}
                           secondary={getTimeFromDate(message.sendTime)}/>
         </ListItem>
     );
@@ -187,7 +187,7 @@ function ChatMeMessage({message}: { message: MessageInfo }) {
                     }>
                         <div
                         >
-                            {message.content}
+                            <MessageContent message={message}/>
                         </div>
                     </CustomMenuContainer>
                 }
@@ -195,6 +195,20 @@ function ChatMeMessage({message}: { message: MessageInfo }) {
         </ListItem>
     );
 
+}
+
+function MessageContent({message}: { message: MessageInfo }) {
+    if (message.type === 'text')
+        return (
+            <>
+                {message.content}
+            </>
+        )
+
+    if (message.type === 'image')
+        return (<img src={message.url} width='30%' height='30%'/>)
+
+    return (<Skeleton/>)
 }
 
 function getAbsoluteDay(date: Date) {
