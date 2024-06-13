@@ -100,11 +100,10 @@ export function Messages({chatId}: Props) {
     }, [messages, me, chat])
 
     return (
-        <List component="main" sx={{
+        <List sx={{
             flexGrow: 1,
             p: 3,
-            height: '100vh',
-            overflow: 'scroll',
+            height: '120vh',
         }}
               style={{
                   display: 'flex',
@@ -127,7 +126,6 @@ function CenterMarker({text}: { text: string | number }) {
             width: '100px',
             height: '20px',
             borderRadius: '100px',
-            position: 'sticky',
             fontSize: 8,
         }}>
             <ListItemText primary={text}/>
