@@ -6,10 +6,12 @@ import com.example.pixel.server.chat.entity.attachment.GroupUserAttachment;
 import com.example.pixel.server.chat.entity.chat.Chat;
 import com.example.pixel.server.chat.entity.chat.ChatGroup;
 import com.example.pixel.server.chat.exception.RoomNotFoundException;
+import com.example.pixel.server.chat.repository.AttachmentRepository;
 import com.example.pixel.server.chat.repository.GroupAttachmentRepository;
 import com.example.pixel.server.chat.repository.RoomRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 
@@ -18,10 +20,24 @@ import java.util.Collection;
 public class RoomService {
 
     private RoomRepository repository;
-    private GroupAttachmentRepository attachmentRepository;
+    private AttachmentRepository attachmentRepository;
+    private GroupAttachmentRepository groupAttachmentRepository;
 
     public Collection<Chat> getAllRooms() {
         return repository.findAll();
+    }
+
+    @Transactional
+    public void leaveRoom(long id, Customer user) {
+        var room = getOneRoom(id);
+        var attachment = room.getAttachment(user);
+        if (room instanceof ChatGroup chat) {
+            chat.getUsers().remove(attachment);
+            if (chat.getUsers().size() > 1)
+                repository.save(room);
+            else
+                repository.deleteById(room.getId());
+        }
     }
 
     public Chat getOneRoom(long id) {
@@ -40,12 +56,12 @@ public class RoomService {
     }
 
     private GroupUserAttachment createAttachment(ChatGroup group, Customer user, GroupUserAttachment.ChatGroupRole role) {
-        return attachmentRepository.findByGroupAndUser(group, user).orElseGet(() -> {
+        return groupAttachmentRepository.findByGroupAndUser(group, user).orElseGet(() -> {
             var attachment = new GroupUserAttachment();
             attachment.setGroup(group);
             attachment.setUser(user);
             attachment.setRole(role);
-            return attachmentRepository.save(attachment);
+            return groupAttachmentRepository.save(attachment);
         });
     }
 

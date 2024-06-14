@@ -33,6 +33,11 @@ public class ChatGroup extends Chat {
         }).findAny().orElseGet(() -> NONE);
     }
 
+    @Override
+    public GroupUserAttachment getAttachment(Customer user) {
+        return users.stream().filter(x -> x.getUser().equals(user)).findAny().get();
+    }
+
     @JsonProperty("type")
     private String getTypeForJSON() {
         return "group";

@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography";
 import AppBar from "@mui/material/AppBar";
 import {UserMeInfo, UserName} from "../user/User";
 import {Profile} from "./Profile";
+import {CreateChat} from './CreateChat';
 
 const drawerWidth = 240;
 
@@ -18,13 +19,20 @@ export default function Home() {
         setChatId(event)
     }, [setChatId])
 
-    const [open, setOpen] = React.useState(false);
+    const [openProfile, setOpenProfile] = React.useState(false);
+    const [openCreateChat, setOpenCreateChat] = React.useState(false);
 
     const handleClickOpen = () => {
-        setOpen(true);
+        setOpenProfile(true);
     };
-    const handleClose = () => {
-        setOpen(false);
+    const handleCloseProfile = () => {
+        setOpenProfile(false);
+    };
+    const handleOpenCreateChat = () => {
+        setOpenCreateChat(true);
+    };
+    const handleCloseCreateChat = () => {
+        setOpenCreateChat(false);
     };
 
     return (
@@ -50,7 +58,7 @@ export default function Home() {
                 >
                     <Toolbar/>
                     <Box sx={{overflow: 'auto'}}>
-                        <Contacts onClick={choiceChat}/>
+                        <Contacts onClick={choiceChat} onOpenCreateChat={handleOpenCreateChat}/>
                     </Box>
                 </Drawer>
                 <Box component="main" sx={{flexGrow: 1, p: 3, padding: 0}}>
@@ -58,7 +66,8 @@ export default function Home() {
                     {chatId ? <Chat chatId={chatId}/> : null}
                 </Box>
             </Box>
-            <Profile open={open} handleClose={handleClose}/>
+            <Profile open={openProfile} handleClose={handleCloseProfile}/>
+            <CreateChat open={openCreateChat} handleClose={handleCloseCreateChat}/>
         </Box>
     );
 }

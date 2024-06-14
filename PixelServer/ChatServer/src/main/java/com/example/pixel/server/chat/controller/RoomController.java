@@ -37,6 +37,11 @@ public class RoomController {
         return roomService.getOneRoom(id);
     }
 
+    @GetMapping("/{id}/leave")
+    public void leaveRoom(@PathVariable long id, Customer user) {
+        roomService.leaveRoom(id, user);
+    }
+
     @HasScopeRead
     @GetMapping("/{id}/users")
     public String getOneRoomUsers(@PathVariable long id, Customer user) throws JsonProcessingException {

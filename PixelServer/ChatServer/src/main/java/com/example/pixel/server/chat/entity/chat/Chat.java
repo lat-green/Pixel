@@ -1,6 +1,7 @@
 package com.example.pixel.server.chat.entity.chat;
 
 import com.example.pixel.server.chat.entity.Customer;
+import com.example.pixel.server.chat.entity.attachment.ChatUserAttachment;
 import com.example.pixel.server.chat.entity.message.Message;
 import com.example.pixel.server.util.entity.BaseEntity;
 import com.example.pixel.server.util.entity.EntityAsIdOnlySerializer;
@@ -38,6 +39,8 @@ public abstract class Chat implements BaseEntity {
     private Date createdDate = new Date();
 
     public abstract ChatRole getUserRole(Customer user);
+
+    public abstract ChatUserAttachment getAttachment(Customer user);
 
     @AllArgsConstructor
     public enum ChatRole {

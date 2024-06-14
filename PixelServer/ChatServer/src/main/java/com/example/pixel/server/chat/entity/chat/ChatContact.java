@@ -1,6 +1,7 @@
 package com.example.pixel.server.chat.entity.chat;
 
 import com.example.pixel.server.chat.entity.Customer;
+import com.example.pixel.server.chat.entity.attachment.ChatChannelUserAttachment;
 import com.example.pixel.server.chat.entity.attachment.ChatContactUserAttachment;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -29,6 +30,11 @@ public class ChatContact extends Chat {
     @Override
     public ChatRole getUserRole(Customer user) {
         return users.stream().filter(x -> x.getUser().equals(user)).map(x -> ADMIN).findAny().orElseGet(() -> NONE);
+    }
+
+    @Override
+    public ChatContactUserAttachment getAttachment(Customer user) {
+        return users.stream().filter(x -> x.getUser().equals(user)).findAny().get();
     }
 
     @JsonProperty("type")

@@ -1,13 +1,10 @@
 import * as React from "react";
-import {useCallback, useEffect, useRef, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import './CustomMenu.css'
-import {useWindowSize} from "./hooks/Hooks";
 
 
 export function CustomMenuContainer({children, contextMenu}) {
     const [menu, setMenu] = useState(null);
-    const ref = useRef(null);
-    const windowSize = useWindowSize()
 
     const onNodeContextMenu = useCallback(
         (event) => {
@@ -15,7 +12,6 @@ export function CustomMenuContainer({children, contextMenu}) {
             event.preventDefault();
             // Calculate position of the context menu. We want to make sure it
             // doesn't get positioned off-screen.
-            const pane = ref.current.getBoundingClientRect();
             setMenu({
                 left: event.clientX,
                 top: event.clientY,
@@ -34,7 +30,6 @@ export function CustomMenuContainer({children, contextMenu}) {
 
     return (
         <div
-            ref={ref}
             onContextMenu={onNodeContextMenu}
         >
             {children}

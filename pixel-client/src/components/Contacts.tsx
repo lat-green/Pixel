@@ -1,27 +1,43 @@
 import React, {useCallback} from "react";
-import {List, ListItem, ListItemButton, ListItemIcon, ListItemText, Skeleton} from "@mui/material";
+import {Button, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Skeleton} from "@mui/material";
 import {useAsync, useOneRoom, useRecipientUser} from "./HookUtil";
 import {getMeChats} from "../api/data/User";
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import {UserAvatar, UserIdInfo, UserName} from "./user/User";
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
-export function Contacts({onClick}: { onClick: (event: number) => void }) {
+export function Contacts({onClick, onOpenCreateChat}: {
+    onClick: (event: number) => void,
+    onOpenCreateChat: () => void
+}) {
     const rooms = useAsync(getMeChats, [])
 
     if (!rooms)
         return (<Skeleton/>)
 
     return (
-        <List>
-            {
-                rooms.map(roomId =>
-                    <ListItem key={roomId} disablePadding>
-                        <ChatComponent roomId={roomId} onClick={onClick}/>
-                    </ListItem>
-                )
-            }
-        </List>
+        <>
+            <List>
+                {
+                    rooms.map(roomId =>
+                        <ListItem key={roomId} disablePadding>
+                            <ChatComponent roomId={roomId} onClick={onClick}/>
+                        </ListItem>
+                    )
+                }
+            </List>
+            <Button sx={{
+                position: 'absolute',
+                bottom: '10px',
+                right: '10px',
+            }} onClick={onOpenCreateChat}>
+                <AddCircleOutlineIcon style={{
+                    width: '40px',
+                    height: '40px',
+                }}/>
+            </Button>
+        </>
     )
 }
 
