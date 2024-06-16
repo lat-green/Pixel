@@ -33,6 +33,10 @@ export interface ImageMessageCreateRequest {
     url: URL,
 }
 
+export interface TextMessageReplaceRequest {
+    content: string,
+}
+
 export async function getOneMessage(messageId: number): Promise<MessageInfo> {
     return sfetch(`${CHAT_URI}/messages/${messageId}`).then(resp => resp.json()).then(toMessage);
 }
@@ -65,6 +69,16 @@ export async function createImageMessage(roomId: number, request: ImageMessageCr
 
 export async function getChatMessages(roomId: number): Promise<MessageInfo[]> {
     return sfetch(`${CHAT_URI}/rooms/${roomId}/messages`).then(resp => resp.json()).then(toMessageEach);
+}
+
+export async function replaceTextMessage(messageId: number, request: TextMessageReplaceRequest) {
+    return sfetch(`${CHAT_URI}/messages/${messageId}/text`, {
+        method: 'PUT',
+        body: JSON.stringify(request),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(resp => resp.json()).then(toMessage);
 }
 
 export function toMessage(message: any): MessageInfo {

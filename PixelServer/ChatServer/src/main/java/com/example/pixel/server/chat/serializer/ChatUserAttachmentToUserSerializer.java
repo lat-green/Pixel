@@ -1,8 +1,8 @@
 package com.example.pixel.server.chat.serializer;
 
-import com.example.pixel.server.chat.entity.attachment.ChatChannelUserAttachment;
-import com.example.pixel.server.chat.entity.attachment.ChatUserAttachment;
-import com.example.pixel.server.chat.entity.attachment.GroupUserAttachment;
+import com.example.pixel.server.chat.entity.attachment.ChannelAttachment;
+import com.example.pixel.server.chat.entity.attachment.ChatAttachment;
+import com.example.pixel.server.chat.entity.attachment.GroupAttachment;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
@@ -12,19 +12,19 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 @Component
-public class ChatUserAttachmentToUserSerializer extends StdSerializer<ChatUserAttachment> {
+public class ChatUserAttachmentToUserSerializer extends StdSerializer<ChatAttachment> {
 
     public ChatUserAttachmentToUserSerializer() {
-        this(ChatUserAttachment.class);
+        this(ChatAttachment.class);
     }
 
-    public ChatUserAttachmentToUserSerializer(Class<ChatUserAttachment> t) {
+    public ChatUserAttachmentToUserSerializer(Class<ChatAttachment> t) {
         super(t);
     }
 
     @Override
-    public void serialize(ChatUserAttachment entity, JsonGenerator generator, SerializerProvider provider) throws IOException {
-        if (entity instanceof GroupUserAttachment e) {
+    public void serialize(ChatAttachment entity, JsonGenerator generator, SerializerProvider provider) throws IOException {
+        if (entity instanceof GroupAttachment e) {
             generator.writeStartObject();
             generator.writeNumberField("id", e.getGroup().getId());
             generator.writeStringField("role", e.getRole().name());
@@ -32,7 +32,7 @@ public class ChatUserAttachmentToUserSerializer extends StdSerializer<ChatUserAt
             generator.writeEndObject();
             return;
         }
-        if (entity instanceof ChatChannelUserAttachment e) {
+        if (entity instanceof ChannelAttachment e) {
             generator.writeStartObject();
             generator.writeNumberField("id", e.getChannel().getId());
             generator.writeStringField("role", e.getRole().name());

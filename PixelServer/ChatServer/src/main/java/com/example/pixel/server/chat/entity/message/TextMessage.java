@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "chat_text_message")
+@Entity(name = "text_message")
 public class TextMessage extends Message {
 
     @Column(nullable = false, length = 4 * 1024)

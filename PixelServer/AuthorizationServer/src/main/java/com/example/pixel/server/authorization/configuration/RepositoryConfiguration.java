@@ -40,7 +40,6 @@ public class RepositoryConfiguration {
         final var profileWriteScope = createScope("profile.write");
         final var openidScope = createScope("openid");
         final var arseny = createUser("Arseny");
-        final var maksim = createUser("Maksim");
         createUser("Ангелина");
         createUser("Света");
         createUser("Никита");

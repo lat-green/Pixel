@@ -1,6 +1,6 @@
 package com.example.pixel.server.chat.entity.attachment;
 
-import com.example.pixel.server.chat.entity.chat.ChatGroup;
+import com.example.pixel.server.chat.entity.chat.ChatChannel;
 import com.example.pixel.server.util.entity.EntityAsIdOnlySerializer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -12,37 +12,37 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+@Entity(name = "channel_attachment")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user", "group"})
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user", "channel"})
 )
-@Entity(name = "group_user_attachment")
-public class GroupUserAttachment extends ChatUserAttachment {
+public class ChannelAttachment extends ChatAttachment {
 
     @JsonSerialize(using = EntityAsIdOnlySerializer.class)
     @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private ChatGroup group;
+    private ChatChannel channel;
 
     @Column(nullable = false)
-    private ChatGroupRole role;
+    private ChatChannelRole role;
 
     @Override
-    public ChatGroup getChatRoom() {
-        return group;
+    public ChatChannel getChatRoom() {
+        return channel;
     }
 
     @JsonProperty("type")
     private String getTypeForJSON() {
-        return "group";
+        return "channel";
     }
 
-    public enum ChatGroupRole {
+    public enum ChatChannelRole {
 
-        ADMIN, USER
+        ADMIN, AUTHOR, PUBLIC_USER, PRIVATE_USER
 
     }
 

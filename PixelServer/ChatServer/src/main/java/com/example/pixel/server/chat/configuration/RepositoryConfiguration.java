@@ -1,9 +1,9 @@
 package com.example.pixel.server.chat.configuration;
 
 import com.example.pixel.server.chat.entity.Customer;
-import com.example.pixel.server.chat.entity.attachment.ChatChannelUserAttachment;
-import com.example.pixel.server.chat.entity.attachment.ChatContactUserAttachment;
-import com.example.pixel.server.chat.entity.attachment.GroupUserAttachment;
+import com.example.pixel.server.chat.entity.attachment.ChannelAttachment;
+import com.example.pixel.server.chat.entity.attachment.ContactAttachment;
+import com.example.pixel.server.chat.entity.attachment.GroupAttachment;
 import com.example.pixel.server.chat.entity.chat.Chat;
 import com.example.pixel.server.chat.entity.chat.ChatChannel;
 import com.example.pixel.server.chat.entity.chat.ChatContact;
@@ -53,9 +53,9 @@ public class RepositoryConfiguration {
         createTextMessage(u1, g1, "Это хорошая идея, а я буду писать о том, кем я хочу стать.");
         createTextMessage(u2, g1, "Спасибо тебе большое за информацию. Пойду готовиться.");
         var g2 = createGroup("11 'Б'");
-        createAttachment(g2, u1, GroupUserAttachment.ChatGroupRole.ADMIN);
-        createAttachment(g2, u2, GroupUserAttachment.ChatGroupRole.USER);
-        createAttachment(g2, u3, GroupUserAttachment.ChatGroupRole.USER);
+        createAttachment(g2, u1, GroupAttachment.ChatGroupRole.ADMIN);
+        createAttachment(g2, u2, GroupAttachment.ChatGroupRole.USER);
+        createAttachment(g2, u3, GroupAttachment.ChatGroupRole.USER);
         createTextMessage(u1, g2, "Привет, Никита");
         createTextMessage(u3, g2, "Привет, Света");
         createTextMessage(u1, g2, "А какой у нас сейчас урок?");
@@ -65,10 +65,10 @@ public class RepositoryConfiguration {
         createTextMessage(u2, g2, "Нет, а ты");
         createTextMessage(u3, g2, "Я да");
         var g3 = createChannel("Школа 109");
-        createAttachment(g3, u4, ChatChannelUserAttachment.ChatChannelRole.ADMIN);
-        createAttachment(g3, u1, ChatChannelUserAttachment.ChatChannelRole.PUBLIC_USER);
-        createAttachment(g3, u2, ChatChannelUserAttachment.ChatChannelRole.PUBLIC_USER);
-        createAttachment(g3, u3, ChatChannelUserAttachment.ChatChannelRole.PUBLIC_USER);
+        createAttachment(g3, u4, ChannelAttachment.ChatChannelRole.ADMIN);
+        createAttachment(g3, u1, ChannelAttachment.ChatChannelRole.PUBLIC_USER);
+        createAttachment(g3, u2, ChannelAttachment.ChatChannelRole.PUBLIC_USER);
+        createAttachment(g3, u3, ChannelAttachment.ChatChannelRole.PUBLIC_USER);
         createTextMessage(u4, g3, """
                 В период летних каникул для учащихся 1-8 классов ГУО "Средняя школа №109 имени П.И. Куприянова
                  г. Жодино" в период с 03.06.2024 по 21.06.2024 организована работа оздоровительного лагеря "Здравиус".
@@ -134,9 +134,9 @@ public class RepositoryConfiguration {
         });
     }
 
-    private GroupUserAttachment createAttachment(ChatGroup group, Customer user, GroupUserAttachment.ChatGroupRole role) {
+    private GroupAttachment createAttachment(ChatGroup group, Customer user, GroupAttachment.ChatGroupRole role) {
         return groupAttachmentRepository.findByGroupAndUser(group, user).orElseGet(() -> {
-            var attachment = new GroupUserAttachment();
+            var attachment = new GroupAttachment();
             attachment.setGroup(group);
             attachment.setUser(user);
             attachment.setRole(role);
@@ -152,9 +152,9 @@ public class RepositoryConfiguration {
         });
     }
 
-    private ChatChannelUserAttachment createAttachment(ChatChannel channel, Customer user, ChatChannelUserAttachment.ChatChannelRole role) {
+    private ChannelAttachment createAttachment(ChatChannel channel, Customer user, ChannelAttachment.ChatChannelRole role) {
         return channelAttachmentRepository.findByChannelAndUser(channel, user).orElseGet(() -> {
-            var attachment = new ChatChannelUserAttachment();
+            var attachment = new ChannelAttachment();
             attachment.setChannel(channel);
             attachment.setUser(user);
             attachment.setRole(role);
@@ -162,9 +162,9 @@ public class RepositoryConfiguration {
         });
     }
 
-    private ChatContactUserAttachment createAttachment(ChatContact contact, Customer user) {
+    private ContactAttachment createAttachment(ChatContact contact, Customer user) {
         return contactAttachmentRepository.findByContactAndUser(contact, user).orElseGet(() -> {
-            var attachment = new ChatContactUserAttachment();
+            var attachment = new ContactAttachment();
             attachment.setContact(contact);
             attachment.setUser(user);
             return contactAttachmentRepository.save(attachment);

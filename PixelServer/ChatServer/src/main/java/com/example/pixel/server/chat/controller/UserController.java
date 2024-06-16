@@ -35,7 +35,7 @@ public class UserController {
     @HasScopeProfileRead
     @GetMapping("/me/chats")
     public String getMeChats(Customer user) throws JsonProcessingException {
-        return objectMapper.writeValueAsString(user.getChats().stream().map(x -> x.getChatRoom().getId()).toList());
+        return objectMapper.writeValueAsString(user.getChats().stream().map(attachment -> attachment.getChatRoom().getId()).toList());
     }
 
     @GetMapping("/{id}")
@@ -48,10 +48,5 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @HasScopeProfileWrite
-    @PutMapping("")
-    public Customer replaceUser(Customer user, @RequestBody CustomerReplaceRequest replaceRequest) throws JsonProcessingException {
-        return userService.replaceUser(user, replaceRequest);
-    }
 
 }

@@ -3,6 +3,7 @@ package com.example.pixel.server.chat.service;
 import com.example.pixel.server.chat.dto.message.ImageMessageCreateRequest;
 import com.example.pixel.server.chat.dto.message.MessageCreateNotification;
 import com.example.pixel.server.chat.dto.message.TextMessageCreateRequest;
+import com.example.pixel.server.chat.dto.message.TextMessageReplaceRequest;
 import com.example.pixel.server.chat.entity.Customer;
 import com.example.pixel.server.chat.entity.message.ImageMessage;
 import com.example.pixel.server.chat.entity.message.Message;
@@ -80,6 +81,22 @@ public class MessageService {
 
     public Message getOneMessage(long id) {
         return repository.findById(id).orElseThrow(() -> new MessageNotFoundException(id));
+    }
+
+    public TextMessage replaceTextMessage(long id, TextMessageReplaceRequest replaceRequest) {
+        var message = (TextMessage) getOneMessage(id);
+        var name = replaceRequest.getContent();
+        if (name != null)
+            message.setContent(name);
+        message = repository.save(message);
+        messagingTemplate.convertAndSendToUser(
+                "" + message.getChat().getId(),
+                "/edit",
+                new MessageCreateNotification(
+                        message.getId()
+                )
+        );
+        return message;
     }
 
 }

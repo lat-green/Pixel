@@ -2,7 +2,8 @@ package com.example.pixel.server.chat.service;
 
 import com.example.pixel.server.chat.dto.room.ChatGroupRoomCreateRequest;
 import com.example.pixel.server.chat.entity.Customer;
-import com.example.pixel.server.chat.entity.attachment.GroupUserAttachment;
+import com.example.pixel.server.chat.entity.attachment.ChatAttachment;
+import com.example.pixel.server.chat.entity.attachment.GroupAttachment;
 import com.example.pixel.server.chat.entity.chat.Chat;
 import com.example.pixel.server.chat.entity.chat.ChatGroup;
 import com.example.pixel.server.chat.exception.RoomNotFoundException;
@@ -33,10 +34,10 @@ public class RoomService {
         var attachment = room.getAttachment(user);
         if (room instanceof ChatGroup chat) {
             chat.getUsers().remove(attachment);
-            if (chat.getUsers().size() > 1)
-                repository.save(room);
-            else
+            if (chat.getUsers().isEmpty())
                 repository.deleteById(room.getId());
+            else
+                repository.save(room);
         }
     }
 
@@ -51,18 +52,29 @@ public class RoomService {
         var room = new ChatGroup();
         room.setTitle(request.getTitle());
         room = repository.save(room);
-        createAttachment(room, user, GroupUserAttachment.ChatGroupRole.ADMIN);
+        createAttachment(room, user, GroupAttachment.ChatGroupRole.ADMIN);
         return room;
     }
 
-    private GroupUserAttachment createAttachment(ChatGroup group, Customer user, GroupUserAttachment.ChatGroupRole role) {
+    private GroupAttachment createAttachment(ChatGroup group, Customer user, GroupAttachment.ChatGroupRole role) {
         return groupAttachmentRepository.findByGroupAndUser(group, user).orElseGet(() -> {
-            var attachment = new GroupUserAttachment();
+            var attachment = new GroupAttachment();
             attachment.setGroup(group);
             attachment.setUser(user);
             attachment.setRole(role);
             return groupAttachmentRepository.save(attachment);
         });
+    }
+
+    public ChatAttachment joinRoom(long roomId, Customer user) {
+        var room = getOneRoom(roomId);
+        return createAttachment(room, user);
+    }
+
+    private ChatAttachment createAttachment(Chat chat, Customer user) {
+        if (chat instanceof ChatGroup group)
+            return createAttachment(group, user, GroupAttachment.ChatGroupRole.USER);
+        throw new UnsupportedOperationException("type = " + chat.getClass());
     }
 
 }

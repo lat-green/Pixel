@@ -1,6 +1,6 @@
 import {useMap, useMeUser, useOneRoom} from "../HookUtil";
 import * as React from "react";
-import {useEffect, useMemo, useState} from "react";
+import {Dispatch, SetStateAction, useEffect, useMemo, useState} from "react";
 import {deleteOneMessage, getOneMessage, MessageInfo} from "../../api/data/Message";
 import {Button, List, ListItem, ListItemAvatar, ListItemText, Skeleton} from "@mui/material";
 import {UserAvatar, UserIdInfo, UserName} from "../user/User";
@@ -8,11 +8,8 @@ import {Room} from "../../api/data/Room";
 import {CustomMenuContainer} from "../CustomMenu";
 import {ContextMenu} from "../styles/styles";
 import {useSubscription} from "react-stomp-hooks";
+import HideIf from "../HideIf";
 
-
-interface Props {
-    chatId: number
-}
 
 export function useMessages(chat: Room | undefined) {
     const [messages, setMessages] = useState<MessageInfo[]>([])
@@ -51,10 +48,27 @@ export function useMessages(chat: Room | undefined) {
         ].filter(m => m.id != messageId))
     });
 
+    useSubscription("/user/" + chat?.id + "/edit", (message) => {
+        const {messageId} = JSON.parse(message.body)
+        setMessages(currentArray => [
+            ...currentArray
+        ].filter(m => m.id != messageId))
+        getOneMessage(messageId).then((message) => {
+            addElement(message)
+        })
+    });
+
     return messages
 }
 
-export function Messages({chatId}: Props) {
+interface Props {
+    chatId: number,
+    editMessageId: number | undefined,
+    setEditMessageId: Dispatch<SetStateAction<number | undefined>>,
+}
+
+
+export function Messages({chatId, editMessageId, setEditMessageId}: Props) {
     const chat = useOneRoom(chatId)
     const me = useMeUser()
     const messages = useMessages(chat)
@@ -86,7 +100,8 @@ export function Messages({chatId}: Props) {
                          }}>
                         {
                             message.user === me.id
-                                ? <ChatMeMessage message={message}/>
+                                ? <ChatMeMessage message={message} editMessageId={editMessageId}
+                                                 setEditMessageId={setEditMessageId}/>
                                 : createMessageComponent(message)
                         }
 
@@ -97,7 +112,7 @@ export function Messages({chatId}: Props) {
         }
         messageComponents.reverse()
         return messageComponents;
-    }, [messages, me, chat])
+    }, [messages, me, chat, editMessageId])
 
     return (
         <List sx={{
@@ -147,7 +162,11 @@ function ChatMessage({message}: { message: MessageInfo }) {
     );
 }
 
-function ChatContactMessage({message}: { message: MessageInfo }) {
+function ChatContactMessage({message}: {
+    message: MessageInfo,
+}) {
+
+
     return (
         <ListItem>
             <ListItemText primary={(<MessageContent message={message}/>)}
@@ -156,10 +175,17 @@ function ChatContactMessage({message}: { message: MessageInfo }) {
     );
 }
 
-function ChatMeMessage({message}: { message: MessageInfo }) {
+function ChatMeMessage({message, editMessageId, setEditMessageId}: {
+    message: MessageInfo,
+    editMessageId: number | undefined,
+    setEditMessageId: Dispatch<SetStateAction<number | undefined>>,
+}) {
 
     function editMessage() {
-        console.log("edit")
+        if (editMessageId === message.id)
+            setEditMessageId(undefined)
+        else
+            setEditMessageId(message.id)
     }
 
     function deleteMessage() {
@@ -179,11 +205,16 @@ function ChatMeMessage({message}: { message: MessageInfo }) {
                             style={{
                                 textAlign: 'right'
                             }}>
-                            {/*<Button variant="text" onClick={editMessage}>Edit</Button>*/}
+                            <HideIf hide={message.type !== "text"}>
+                                <Button variant="text" onClick={editMessage}>Edit</Button>
+                            </HideIf>
                             <Button color='error' variant="text" onClick={deleteMessage}>Delete</Button>
                         </ContextMenu>
                     }>
                         <div
+                            style={{
+                                color: editMessageId == message.id ? 'blue' : 'black'
+                            }}
                         >
                             <MessageContent message={message}/>
                         </div>
@@ -196,15 +227,22 @@ function ChatMeMessage({message}: { message: MessageInfo }) {
 }
 
 function MessageContent({message}: { message: MessageInfo }) {
-    if (message.type === 'text')
+    if (message.type === 'text') {
+        if (message.content.startsWith('http://'))
+            return (
+                <a href={message.content}>
+                    {message.content}
+                </a>
+            )
         return (
             <>
                 {message.content}
             </>
         )
+    }
 
     if (message.type === 'image')
-        return (<img src={message.url} width='30%' height='30%'/>)
+        return (<img src={message.url} width='50%' height='50%'/>)
 
     return (<Skeleton/>)
 }

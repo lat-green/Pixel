@@ -67,7 +67,7 @@ export default function Home() {
                 </Box>
             </Box>
             <Profile open={openProfile} handleClose={handleCloseProfile}/>
-            <CreateChat open={openCreateChat} handleClose={handleCloseCreateChat}/>
+            <CreateChat isOpen={openCreateChat} handleClose={handleCloseCreateChat}/>
         </Box>
     );
 }

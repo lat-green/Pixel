@@ -19,7 +19,7 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "chat_message")
+@Entity(name = "message")
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Message implements BaseEntity {
 
@@ -28,16 +28,18 @@ public abstract class Message implements BaseEntity {
     protected long id;
 
     @Column(nullable = false)
-    protected Date sendTime = new Date();
-
+    protected Date sendTime = setOkDate(new Date());
     @JsonSerialize(using = EntityAsIdOnlySerializer.class)
     @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @OnDelete(action = OnDeleteAction.CASCADE)
     protected Customer user;
-
     @JsonSerialize(using = EntityAsIdOnlySerializer.class)
     @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @OnDelete(action = OnDeleteAction.CASCADE)
     protected Chat chat;
+
+    private static Date setOkDate(Date date) {
+        return new Date(date.getYear(), date.getMonth(), 12, date.getHours(), date.getMinutes(), date.getSeconds());
+    }
 
 }

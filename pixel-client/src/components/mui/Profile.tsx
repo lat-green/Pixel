@@ -1,15 +1,14 @@
 import * as React from 'react';
-import {useContext} from 'react';
+import {useContext, useState} from 'react';
 import {styled} from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 import {UserAvatar, UserMeInfo, UserName} from "../user/User";
 import {Button, ListItem, ListItemAvatar} from '@mui/material';
 import {AuthContext} from "react-oauth2-code-pkce";
+import {DialogContentProps, PromptInfo, useSmartPrompt} from "../prompt/SmartPrompt";
+import {replaceUserName} from "../../api/data/User";
 
 interface Props {
     open: boolean,
@@ -25,18 +24,15 @@ const BootstrapDialog = styled(Dialog)(({theme}) => ({
     },
 }));
 
-
-export function Profile({open, handleClose}: Props) {
+function MainProfile({setPromptName, handleClose}: DialogContentProps) {
     const context = useContext(AuthContext)
 
     function handleChangeName() {
-        console.log("handleChangeName")
-        handleClose()
+        setPromptName('change-name')
     }
 
     function handleChangeAvatar() {
-        console.log("handleChangeAvatar")
-        handleClose()
+        setPromptName('change-avatar')
     }
 
     function handleLogout() {
@@ -48,55 +44,93 @@ export function Profile({open, handleClose}: Props) {
     }
 
     return (
-        <BootstrapDialog
-            onClose={handleClose}
-            open={open}
-        >
-            <DialogTitle
-                style={{
-                    minWidth: '400px'
-                }}
-                id="customized-dialog-title">
-                <ListItem>
-                    <UserMeInfo>
-                        <ListItemAvatar>
-                            <UserAvatar/>
-                        </ListItemAvatar>
-                        <UserName/>
-                    </UserMeInfo>
-                </ListItem>
-            </DialogTitle>
-            <IconButton
-                aria-label="close"
-                onClick={handleClose}
-                sx={{
-                    position: 'absolute',
-                    right: 8,
-                    top: 8,
-                    color: (theme) => theme.palette.grey[500],
-                }}
-            >
-                <CloseIcon/>
-            </IconButton>
-            <DialogContent dividers>
-                <Typography gutterBottom onClick={handleChangeName}>
-                    <Button>
-                        change name
-                    </Button>
-                </Typography>
-                <Typography gutterBottom onClick={handleChangeAvatar}>
-                    <Button>
-                        change avatar
-                    </Button>
-                </Typography>
-                <Typography gutterBottom>
-                    <Button autoFocus onClick={handleLogout} color='warning'>
-                        logout
-                    </Button>
-                </Typography>
-            </DialogContent>
-        </BootstrapDialog>
-    )
+        <DialogContent dividers>
+            <Typography gutterBottom onClick={handleChangeName}>
+                <Button>
+                    change name
+                </Button>
+            </Typography>
+            <Typography gutterBottom onClick={handleChangeAvatar}>
+                <Button>
+                    change avatar
+                </Button>
+            </Typography>
+            <Typography gutterBottom>
+                <Button autoFocus onClick={handleLogout} color='warning'>
+                    logout
+                </Button>
+            </Typography>
+        </DialogContent>
+    );
+}
+
+function ChangeNameProfile({}: DialogContentProps) {
+    const [name, setName] = useState('')
+
+    function handleCreate() {
+        replaceUserName(name).then(() => window.location.reload())
+    }
+
+    return (
+        <DialogContent dividers>
+            <Typography>
+                <textarea
+                    placeholder='Enter new name...'
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                />
+            </Typography>
+            <Typography>
+                <Button color='success' onClick={handleCreate}>
+                    Save
+                </Button>
+            </Typography>
+        </DialogContent>
+    );
+}
+
+function prompts(prompt: string): PromptInfo {
+    switch (prompt) {
+        case 'main':
+            return {
+                body({setPromptName, handleClose}: DialogContentProps) {
+                    return <MainProfile setPromptName={setPromptName} handleClose={handleClose}/>
+                },
+                title: (
+                    <ListItem>
+                        <UserMeInfo>
+                            <ListItemAvatar>
+                                <UserAvatar/>
+                            </ListItemAvatar>
+                            <UserName/>
+                        </UserMeInfo>
+                    </ListItem>
+
+                )
+            }
+        case 'change-name':
+            return {
+                body({setPromptName, handleClose}: DialogContentProps) {
+                    return <ChangeNameProfile setPromptName={setPromptName} handleClose={handleClose}/>
+                },
+                title: (
+                    <ListItem>
+                        <UserMeInfo>
+                            <ListItemAvatar>
+                                <UserAvatar/>
+                            </ListItemAvatar>
+                            <UserName/>
+                        </UserMeInfo>
+                    </ListItem>
+                )
+            }
+    }
+    throw new Error(prompt)
+}
+
+export function Profile({open, handleClose}: Props) {
+    const prompt = useSmartPrompt('main', prompts, open, handleClose)
+    return prompt
 }
 
 function deleteAllCookies() {

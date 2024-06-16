@@ -7,8 +7,8 @@ export interface User {
 }
 
 export interface UserReplaceRequest {
-    username: string,
-    avatar: string
+    username?: string,
+    avatar?: string
 }
 
 export async function getMeUser(): Promise<User> {
@@ -23,9 +23,18 @@ export async function getOneUser(id: number): Promise<User> {
     return ffetch(`${CHAT_URI}/users/${id}`).then(resp => resp.json());
 }
 
+export async function replaceUserName(name: string): Promise<User> {
+    return replaceUser({
+        username: name
+    })
+}
+
 export async function replaceUser(request: UserReplaceRequest): Promise<User> {
-    return ffetch(`${CHAT_URI}/users`, {
+    return sfetch(`${CHAT_URI}/users`, {
         method: 'PUT',
-        body: JSON.stringify(request)
+        body: JSON.stringify(request),
+        headers: {
+            'Content-Type': 'application/json'
+        }
     }).then(resp => resp.json());
 }

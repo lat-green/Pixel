@@ -1,6 +1,6 @@
 package com.example.pixel.server.chat.entity;
 
-import com.example.pixel.server.chat.entity.attachment.ChatUserAttachment;
+import com.example.pixel.server.chat.entity.attachment.ChatAttachment;
 import com.example.pixel.server.util.entity.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -10,7 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 @Data
 @Builder
@@ -28,7 +28,7 @@ public class Customer implements BaseEntity {
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
-    private Set<ChatUserAttachment> chats;
+    private List<ChatAttachment> chats;
 
     @Column(name = "created_date", nullable = false, updatable = false)
     private Date createdDate;

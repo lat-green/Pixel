@@ -17,9 +17,9 @@ import org.hibernate.annotations.OnDeleteAction;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "chat_user_attachment")
+@Entity(name = "attachment")
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class ChatUserAttachment implements BaseEntity {
+public abstract class ChatAttachment implements BaseEntity {
 
     @Id
     @GeneratedValue

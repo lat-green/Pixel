@@ -1,81 +1,109 @@
 import * as React from 'react';
-import {styled} from '@mui/material/styles';
-import Dialog from '@mui/material/Dialog';
+import {useState} from 'react';
 import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
-import {Button} from '@mui/material';
+import {Button, DialogContent} from '@mui/material';
+import {DialogContentProps, PromptInfo, useSmartPrompt} from "../prompt/SmartPrompt";
 import {createGroupRoom} from "../../api/data/Room";
 
 interface Props {
-    open: boolean,
+    isOpen: boolean,
     handleClose: () => void
 }
 
-const BootstrapDialog = styled(Dialog)(({theme}) => ({
-    '& .MuiDialogContent-root': {
-        padding: theme.spacing(2),
-    },
-    '& .MuiDialogActions-root': {
-        padding: theme.spacing(1),
-    },
-}));
+function CreateGroupDialogContent({setPromptName}: DialogContentProps) {
+    const [title, setTitle] = useState('')
 
-export function CreateChat({open, handleClose}: Props) {
-
-    function handleCreateGroup() {
-        const title = prompt('Enter title of chat');
-        if (title)
-            createGroupRoom({
-                title: title
-            })
-        handleClose()
-    }
-
-    function handleCreateChannel() {
-
+    function handleCreate() {
+        createGroupRoom({
+            title: title
+        }).then(() => window.location.reload())
     }
 
     return (
-        <BootstrapDialog
-            onClose={handleClose}
-            open={open}
-        >
-            <DialogTitle
-                style={{
-                    minWidth: '400px'
-                }}
-                id="customized-dialog-title">
-                Create chat
-            </DialogTitle>
-            <IconButton
-                aria-label="close"
-                onClick={handleClose}
-                sx={{
-                    position: 'absolute',
-                    right: 8,
-                    top: 8,
-                    color: (theme) => theme.palette.grey[500],
-                }}
-            >
-                <CloseIcon/>
-            </IconButton>
-            <DialogContent dividers>
-                <Typography>
-                    <Button onClick={handleCreateGroup}>
+        <DialogContent dividers>
+            <Typography>
+                <textarea
+                    placeholder='Enter title...'
+                    value={title}
+                    onChange={e => setTitle(e.target.value)}
+                />
+            </Typography>
+            <Typography>
+                <Button color='success' onClick={handleCreate}>
+                    Create
+                </Button>
+            </Typography>
+        </DialogContent>
+    );
+}
+
+function MainDialogContent({setPromptName}: DialogContentProps) {
+
+    function handleCreateGroup() {
+        setPromptName('create-group')
+    }
+
+    function handleCreateChannel() {
+        setPromptName('create-channel')
+    }
+
+    return (
+        <DialogContent dividers>
+            <Typography>
+                <Button onClick={handleCreateGroup}>
+                    Create group
+                </Button>
+            </Typography>
+            <Typography>
+                <Button onClick={handleCreateChannel}>
+                    Create channal
+                </Button>
+            </Typography>
+        </DialogContent>
+    );
+}
+
+function prompts(prompt: string): PromptInfo {
+    switch (prompt) {
+        case 'main':
+            return {
+                body({setPromptName, handleClose}: DialogContentProps) {
+                    return <MainDialogContent setPromptName={setPromptName} handleClose={handleClose}/>
+                },
+                title: (
+                    <DialogTitle
+                        style={{
+                            minWidth: '400px'
+                        }}
+                        id="customized-dialog-title">
+                        Create chat
+                    </DialogTitle>
+                )
+            }
+        case 'create-group':
+            return {
+                body({setPromptName, handleClose}: DialogContentProps) {
+                    return <CreateGroupDialogContent setPromptName={setPromptName} handleClose={handleClose}/>
+                },
+                title: (
+                    <DialogTitle
+                        style={{
+                            minWidth: '400px'
+                        }}
+                        id="customized-dialog-title">
                         Create group
-                    </Button>
-                </Typography>
-                <Typography>
-                    <Button onClick={handleCreateChannel}>
-                        Create channal
-                    </Button>
-                </Typography>
-            </DialogContent>
-        </BootstrapDialog>
-    )
+                    </DialogTitle>
+                )
+            }
+
+    }
+    throw new Error(prompt)
+}
+
+export function CreateChat({isOpen, handleClose}: Props) {
+    const prompt = useSmartPrompt('main', prompts, isOpen, handleClose)
+    return prompt
 }
 
 function deleteAllCookies() {

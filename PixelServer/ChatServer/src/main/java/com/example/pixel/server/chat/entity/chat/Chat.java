@@ -1,7 +1,7 @@
 package com.example.pixel.server.chat.entity.chat;
 
 import com.example.pixel.server.chat.entity.Customer;
-import com.example.pixel.server.chat.entity.attachment.ChatUserAttachment;
+import com.example.pixel.server.chat.entity.attachment.ChatAttachment;
 import com.example.pixel.server.chat.entity.message.Message;
 import com.example.pixel.server.util.entity.BaseEntity;
 import com.example.pixel.server.util.entity.EntityAsIdOnlySerializer;
@@ -12,11 +12,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
-@Entity(name = "chat_room")
+@Entity(name = "chat")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -33,14 +33,14 @@ public abstract class Chat implements BaseEntity {
 
     @JsonSerialize(using = EntityAsIdOnlySerializer.class)
     @OneToMany(mappedBy = "chat", orphanRemoval = true, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
-    private Set<Message> messages = new HashSet<>();
+    private List<Message> messages = new ArrayList<>();
 
     @Column(name = "created_date", nullable = false, updatable = false)
     private Date createdDate = new Date();
 
     public abstract ChatRole getUserRole(Customer user);
 
-    public abstract ChatUserAttachment getAttachment(Customer user);
+    public abstract ChatAttachment getAttachment(Customer user);
 
     @AllArgsConstructor
     public enum ChatRole {

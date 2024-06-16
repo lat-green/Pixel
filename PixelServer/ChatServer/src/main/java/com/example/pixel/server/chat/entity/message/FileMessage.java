@@ -7,7 +7,7 @@ import lombok.*;
 
 import java.net.URL;
 
-@Entity(name = "chat_file_message")
+@Entity(name = "file_message")
 @Getter
 @Setter
 @Builder

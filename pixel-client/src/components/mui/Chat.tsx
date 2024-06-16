@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {SetStateAction, useState} from 'react';
+import {SetStateAction, useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import AppBar from '@mui/material/AppBar';
 import Typography from '@mui/material/Typography';
@@ -21,12 +21,13 @@ import {getRoomUsers, leaveRoom, Room, UserChanelRoleAttachmentRole, UserRoleAtt
 import './Chat.css'
 import MenuIcon from '@mui/icons-material/Menu';
 import {Send} from '@mui/icons-material';
-import {createImageMessage, createTextMessage} from "../../api/data/Message";
+import {createImageMessage, createTextMessage, getOneMessage, replaceTextMessage} from "../../api/data/Message";
 import {Messages} from "./Messages";
 import DragDrop from '../DragDrop';
 import {uploadFile} from "../../api/Files";
 import HideIf from "../HideIf";
 import {User} from "../../api/data/User";
+import {CLIENT_URI} from "../../api/FetchUtil";
 
 async function getCanWrite(room: Room | undefined, user: User | undefined) {
     if (!room)
@@ -52,6 +53,7 @@ async function getAttachment(room: Room, user: User) {
 }
 
 export function Chat({chatId}: { chatId: number }) {
+    const [editMessageId, setEditMessageId] = useState<number>()
     const [text, setText] = useState('')
     const chat = useOneRoom(chatId)
     const chatTitle = useChatTitle(chat)
@@ -59,6 +61,16 @@ export function Chat({chatId}: { chatId: number }) {
     const [open, setOpen] = React.useState(false);
     const [file, setFile] = useState<File>()
     const canWrite = useAsync(() => getCanWrite(chat, me), [chat, me]) && true
+
+    const editMessage = useAsync(() => editMessageId
+            ? getOneMessage(editMessageId)
+            : Promise.resolve(undefined)
+        , [editMessageId])
+
+    useEffect(() => {
+        if (editMessage && editMessage.type === 'text')
+            setText(editMessage.content)
+    }, [editMessage]);
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -74,21 +86,35 @@ export function Chat({chatId}: { chatId: number }) {
     if (!me)
         return (<Skeleton/>)
 
+    if (editMessageId && !editMessage)
+        return (<Skeleton/>)
+
     const sendMessage = (msg: string) => {
         if (msg.trim() !== "") {
             if (chat)
-                createTextMessage(chat.id, {
-                    content: msg,
-                }).then(message => {
-                })
+                if (editMessageId) {
+                    replaceTextMessage(editMessageId, {
+                        content: msg,
+                    }).then(message => {
+                        setEditMessageId(undefined)
+                    })
+                } else
+                    createTextMessage(chat.id, {
+                        content: msg,
+                    }).then(message => {
+                    })
 
             setText("")
         }
     };
 
     function handleExit() {
-        leaveRoom(chatId).then(() => {
-        })
+        leaveRoom(chatId).then(chat => window.location.reload())
+    }
+
+    function handleCopyJoinLink() {
+        if (chat)
+            navigator.clipboard.writeText(getJoinLink(chat))
     }
 
     function handleChangeFile(file: SetStateAction<File>) {
@@ -135,14 +161,22 @@ export function Chat({chatId}: { chatId: number }) {
                         <ChatUsers chatId={chatId}/>
                     </Box>
                     <Divider/>
-                    <Box sx={{p: 1, m: 1}}>
+                    <HideIf hide={chat.type == 'contact'}>
+                        <Box sx={{m: 1}}>
+                            <Button onClick={handleCopyJoinLink}>
+                                Copy join link
+                            </Button>
+                        </Box>
+                    </HideIf>
+                    <Box sx={{m: 1}}>
                         <Button color='warning' onClick={handleExit}>
                             Exit
                         </Button>
                     </Box>
                 </Box>
             </Drawer>
-            <Messages chatId={chatId}/>
+            <Messages chatId={chatId} editMessageId={editMessageId}
+                      setEditMessageId={setEditMessageId}/>
             <HideIf hide={!canWrite}>
                 <AppBar position="sticky" color='inherit'
                         sx={{bottom: '0px', zIndex: (theme) => theme.zIndex.drawer - 1}}>
@@ -153,7 +187,9 @@ export function Chat({chatId}: { chatId: number }) {
                             <DragDrop handleChangeFile={handleChangeFile}>
                                 <textarea
                                     name="user_input"
-                                    placeholder="Напишите свое сообщение..."
+                                    placeholder={
+                                        "Напишите свое сообщение..."
+                                    }
                                     value={text}
                                     onChange={(event) => setText(event.target.value)}
                                     onKeyPress={(event) => {
@@ -224,4 +260,9 @@ function ChatUsers({
             }
         </List>
     )
+}
+
+
+function getJoinLink(chat: Room) {
+    return `${CLIENT_URI}/join/${chat.id}`;
 }

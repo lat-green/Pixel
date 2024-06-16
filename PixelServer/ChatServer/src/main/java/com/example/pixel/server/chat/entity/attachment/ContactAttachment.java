@@ -1,49 +1,38 @@
 package com.example.pixel.server.chat.entity.attachment;
 
-import com.example.pixel.server.chat.entity.chat.ChatChannel;
+import com.example.pixel.server.chat.entity.chat.ChatContact;
 import com.example.pixel.server.util.entity.EntityAsIdOnlySerializer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-@Entity(name = "group_channel_attachment")
-@Data
+@Entity(name = "contact_attachment")
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user", "channel"})
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user", "contact"})
 )
-public class ChatChannelUserAttachment extends ChatUserAttachment {
+public class ContactAttachment extends ChatAttachment {
 
     @JsonSerialize(using = EntityAsIdOnlySerializer.class)
     @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private ChatChannel channel;
-
-    @Column(nullable = false)
-    private ChatChannelRole role;
+    private ChatContact contact;
 
     @Override
-    public ChatChannel getChatRoom() {
-        return channel;
+    public ChatContact getChatRoom() {
+        return contact;
     }
 
     @JsonProperty("type")
     private String getTypeForJSON() {
-        return "channel";
-    }
-
-    public enum ChatChannelRole {
-
-        ADMIN, AUTHOR, PUBLIC_USER, PRIVATE_USER
-
+        return "contact";
     }
 
 }
