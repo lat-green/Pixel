@@ -5,20 +5,22 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.*;
 
+import java.net.URL;
+
+@Entity(name = "image_message")
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "text_message")
-public class TextMessage extends Message {
+public class ImageUserMessage extends UserMessage {
 
-    @Column(nullable = false, length = 4 * 1024)
-    private String content;
+    @Column(nullable = false)
+    private URL url;
 
     @JsonProperty("type")
     private String getTypeForJSON() {
-        return "text";
+        return "image";
     }
 
 }

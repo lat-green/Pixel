@@ -6,23 +6,25 @@ import com.example.pixel.server.chat.entity.attachment.ChatAttachment;
 import com.example.pixel.server.chat.entity.attachment.GroupAttachment;
 import com.example.pixel.server.chat.entity.chat.Chat;
 import com.example.pixel.server.chat.entity.chat.ChatGroup;
+import com.example.pixel.server.chat.entity.message.SystemMessage;
 import com.example.pixel.server.chat.exception.RoomNotFoundException;
-import com.example.pixel.server.chat.repository.AttachmentRepository;
-import com.example.pixel.server.chat.repository.GroupAttachmentRepository;
-import com.example.pixel.server.chat.repository.RoomRepository;
+import com.example.pixel.server.chat.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.Date;
 
 @AllArgsConstructor
 @Component
 public class RoomService {
 
+    private final SystemMessageRepository systemMessageRepository;
     private RoomRepository repository;
     private AttachmentRepository attachmentRepository;
     private GroupAttachmentRepository groupAttachmentRepository;
+    private MessageRepository messageRepository;
 
     public Collection<Chat> getAllRooms() {
         return repository.findAll();
@@ -33,16 +35,29 @@ public class RoomService {
         var room = getOneRoom(id);
         var attachment = room.getAttachment(user);
         if (room instanceof ChatGroup chat) {
-            chat.getUsers().remove(attachment);
-            if (chat.getUsers().isEmpty())
-                repository.deleteById(room.getId());
-            else
-                repository.save(room);
+            if (chat.getUsers().remove(attachment))
+                if (chat.getUsers().isEmpty())
+                    repository.deleteById(room.getId());
+                else {
+                    createSystemMessage(room, user.getUsername() + " leave");
+                    repository.save(room);
+                }
         }
     }
 
     public Chat getOneRoom(long id) {
         return repository.findById(id).orElseThrow(() -> new RoomNotFoundException(id));
+    }
+
+    private void createSystemMessage(Chat chat, String content) {
+        var messages = systemMessageRepository.findAllByChatAndContent(chat, content);
+        var now = new Date();
+        if (messages.stream().noneMatch(x -> x.getSendTime().getTime() - now.getTime() < 10_000)) {
+            var message = new SystemMessage();
+            message.setChat(chat);
+            message.setContent(content);
+            messageRepository.save(message);
+        }
     }
 
     public Chat createGroupRoom(
@@ -68,6 +83,11 @@ public class RoomService {
 
     public ChatAttachment joinRoom(long roomId, Customer user) {
         var room = getOneRoom(roomId);
+        if (room.getUserRole(user) != Chat.ChatRole.NONE) {
+            var attachment = createAttachment(room, user);
+            createSystemMessage(room, user.getUsername() + " join");
+            return attachment;
+        }
         return createAttachment(room, user);
     }
 

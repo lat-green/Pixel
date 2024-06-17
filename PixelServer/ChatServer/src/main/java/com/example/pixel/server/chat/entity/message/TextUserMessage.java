@@ -5,22 +5,20 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.*;
 
-import java.net.URL;
-
-@Entity(name = "file_message")
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class FileMessage extends Message {
+@Entity(name = "text_message")
+public class TextUserMessage extends UserMessage {
 
-    @Column(nullable = false)
-    private URL url;
+    @Column(nullable = false, length = 4 * 1024)
+    private String content;
 
     @JsonProperty("type")
     private String getTypeForJSON() {
-        return "file";
+        return "text";
     }
 
 }

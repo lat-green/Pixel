@@ -75,8 +75,8 @@ export function Messages({chatId, editMessageId, setEditMessageId}: Props) {
 
     const createMessageComponent = useMap(chat?.type, (type) => {
         if (type === "contact")
-            return (message: MessageInfo) => (<ChatContactMessage message={message}/>)
-        return (message: MessageInfo) => (<ChatMessage message={message}/>)
+            return (message: MessageInfo) => (<ChatContactMessage key={message.id} message={message}/>)
+        return (message: MessageInfo) => (<ChatMessage key={message.id} message={message}/>)
     })
 
     const messageComponents = useMemo(() => {
@@ -94,18 +94,17 @@ export function Messages({chatId, editMessageId, setEditMessageId}: Props) {
                     messageComponents.push(component)
                 }
                 const component = (
-                    <div key={message.id}
-                         style={{
-                             display: 'flex'
-                         }}>
+                    <>
                         {
                             message.user === me.id
-                                ? <ChatMeMessage message={message} editMessageId={editMessageId}
+                                ? <ChatMeMessage key={message.id}
+                                                 message={message} editMessageId={editMessageId}
                                                  setEditMessageId={setEditMessageId}/>
-                                : createMessageComponent(message)
+                                : message.type === 'system'
+                                    ? <SystemMessage key={message.id} text={message.content}/>
+                                    : createMessageComponent(message)
                         }
-
-                    </div>
+                    </>
                 )
                 messageComponents.push(component)
             }
@@ -139,6 +138,23 @@ function CenterMarker({text}: { text: string | number }) {
             background: 'gray',
             alignSelf: 'center',
             width: '100px',
+            height: '20px',
+            borderRadius: '100px',
+            fontSize: 8,
+        }}>
+            <ListItemText primary={text}/>
+        </ListItem>
+    );
+}
+
+function SystemMessage({text}: { text: string | number }) {
+    return (
+        <ListItem style={{
+            color: 'white',
+            textAlign: 'center',
+            background: 'gray',
+            alignSelf: 'center',
+            width: '200px',
             height: '20px',
             borderRadius: '100px',
             fontSize: 8,

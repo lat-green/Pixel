@@ -8,7 +8,7 @@ import com.example.pixel.server.chat.entity.chat.Chat;
 import com.example.pixel.server.chat.entity.chat.ChatChannel;
 import com.example.pixel.server.chat.entity.chat.ChatContact;
 import com.example.pixel.server.chat.entity.chat.ChatGroup;
-import com.example.pixel.server.chat.entity.message.TextMessage;
+import com.example.pixel.server.chat.entity.message.TextUserMessage;
 import com.example.pixel.server.chat.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -28,7 +28,7 @@ import static java.lang.Thread.sleep;
 public class RepositoryConfiguration {
 
     private final UserRepository userRepository;
-    private final MessageRepository messageRepository;
+    private final UserMessageRepository messageRepository;
     private final TextMessageRepository textMessageRepository;
     private final RoomRepository roomRepository;
     private final GroupAttachmentRepository groupAttachmentRepository;
@@ -39,6 +39,7 @@ public class RepositoryConfiguration {
     @Transactional
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
+        messageRepository.deleteAll();
         updateUsersCreateDate();
         var u1 = userRepository.findByUsername("Света").orElseThrow();
         var u2 = userRepository.findByUsername("Ангелина").orElseThrow();
@@ -109,14 +110,14 @@ public class RepositoryConfiguration {
         return contact;
     }
 
-    private TextMessage createTextMessage(Customer user, Chat room, String content) {
+    private TextUserMessage createTextMessage(Customer user, Chat room, String content) {
         return textMessageRepository.findByChatAndUserAndContent(room, user, content).orElseGet(() -> {
             try {
                 sleep(2000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            var message = new TextMessage();
+            var message = new TextUserMessage();
             message.setContent(content);
             message.setUser(user);
             message.setChat(room);

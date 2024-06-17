@@ -5,9 +5,10 @@ import com.example.pixel.server.chat.dto.message.MessageCreateNotification;
 import com.example.pixel.server.chat.dto.message.TextMessageCreateRequest;
 import com.example.pixel.server.chat.dto.message.TextMessageReplaceRequest;
 import com.example.pixel.server.chat.entity.Customer;
-import com.example.pixel.server.chat.entity.message.ImageMessage;
+import com.example.pixel.server.chat.entity.message.ImageUserMessage;
 import com.example.pixel.server.chat.entity.message.Message;
-import com.example.pixel.server.chat.entity.message.TextMessage;
+import com.example.pixel.server.chat.entity.message.TextUserMessage;
+import com.example.pixel.server.chat.entity.message.UserMessage;
 import com.example.pixel.server.chat.exception.MessageNotFoundException;
 import com.example.pixel.server.chat.repository.MessageRepository;
 import com.example.pixel.server.chat.repository.RoomRepository;
@@ -15,7 +16,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
 import java.util.List;
 
 @AllArgsConstructor
@@ -26,16 +26,16 @@ public class MessageService {
     private final RoomRepository roomRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public Collection<Message> getAllMessages() {
+    public List<Message> getAllMessages() {
         return repository.findAll();
     }
 
-    public Message createTextMessage(
+    public UserMessage createTextMessage(
             long roomId,
             Customer user,
             TextMessageCreateRequest request
     ) {
-        var message = new TextMessage();
+        var message = new TextUserMessage();
         message.setChat(roomRepository.getReferenceById(roomId));
         message.setUser(user);
         message.setContent(request.getContent());
@@ -48,8 +48,8 @@ public class MessageService {
         return message;
     }
 
-    public Message createImageMessage(long roomId, Customer user, ImageMessageCreateRequest request) {
-        var message = new ImageMessage();
+    public UserMessage createImageMessage(long roomId, Customer user, ImageMessageCreateRequest request) {
+        var message = new ImageUserMessage();
         message.setChat(roomRepository.getReferenceById(roomId));
         message.setUser(user);
         message.setUrl(request.getUrl());
@@ -62,7 +62,7 @@ public class MessageService {
         return message;
     }
 
-    public List<Message> getAllMessagesOfRoom(long roomId) {
+    public List<UserMessage> getAllMessagesOfRoom(long roomId) {
         var room = roomRepository.getReferenceById(roomId);
         return repository.findAllByChat(room);
     }
@@ -83,8 +83,8 @@ public class MessageService {
         return repository.findById(id).orElseThrow(() -> new MessageNotFoundException(id));
     }
 
-    public TextMessage replaceTextMessage(long id, TextMessageReplaceRequest replaceRequest) {
-        var message = (TextMessage) getOneMessage(id);
+    public TextUserMessage replaceTextMessage(long id, TextMessageReplaceRequest replaceRequest) {
+        var message = (TextUserMessage) getOneMessage(id);
         var name = replaceRequest.getContent();
         if (name != null)
             message.setContent(name);

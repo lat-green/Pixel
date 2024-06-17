@@ -1,7 +1,7 @@
 import {CHAT_URI, sfetch} from "../FetchUtil";
 
 
-export type MessageInfoType = "text" | "image"
+export type MessageInfoType = "text" | "image" | "system"
 
 interface MessageInfoRaw {
     id: number,
@@ -23,7 +23,12 @@ export interface ImageMessageInfo extends MessageInfoRaw {
     type: "image",
 }
 
-export type MessageInfo = TextMessageInfo | ImageMessageInfo
+export interface SystemMessageInfo extends MessageInfoRaw {
+    content: string,
+    type: "system",
+}
+
+export type MessageInfo = TextMessageInfo | ImageMessageInfo | SystemMessageInfo
 
 export interface TextMessageCreateRequest {
     content: string,
