@@ -81,6 +81,14 @@ public class RoomService {
         });
     }
 
+    public ChatAttachment updateLastRead(long roomId, Customer user) {
+        var chat = getOneRoom(roomId);
+        var attachment = chat.getAttachment(user);
+        attachment.updateLastRead();
+        attachmentRepository.save(attachment);
+        return attachment;
+    }
+
     public ChatAttachment joinRoom(long roomId, Customer user) {
         var room = getOneRoom(roomId);
         if (room.getUserRole(user) != Chat.ChatRole.NONE) {

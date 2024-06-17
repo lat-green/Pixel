@@ -31,7 +31,7 @@ public class GroupAttachment extends ChatAttachment {
     private ChatGroupRole role;
 
     @Override
-    public ChatGroup getChatRoom() {
+    public ChatGroup getChat() {
         return group;
     }
 

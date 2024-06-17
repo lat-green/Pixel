@@ -95,6 +95,6 @@ export function toMessage(message: any): MessageInfo {
 export function toMessageEach(messages: any[]): MessageInfo[] {
     let result: MessageInfo[] = []
     for (const message of messages)
-        result.push(message)
+        result.push(toMessage(message))
     return result
 }

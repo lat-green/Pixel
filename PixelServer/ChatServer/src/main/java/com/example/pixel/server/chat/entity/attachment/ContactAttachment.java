@@ -26,7 +26,7 @@ public class ContactAttachment extends ChatAttachment {
     private ChatContact contact;
 
     @Override
-    public ChatContact getChatRoom() {
+    public ChatContact getChat() {
         return contact;
     }
 

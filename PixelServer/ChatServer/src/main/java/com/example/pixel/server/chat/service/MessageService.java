@@ -10,6 +10,7 @@ import com.example.pixel.server.chat.entity.message.Message;
 import com.example.pixel.server.chat.entity.message.TextUserMessage;
 import com.example.pixel.server.chat.entity.message.UserMessage;
 import com.example.pixel.server.chat.exception.MessageNotFoundException;
+import com.example.pixel.server.chat.repository.AttachmentRepository;
 import com.example.pixel.server.chat.repository.MessageRepository;
 import com.example.pixel.server.chat.repository.RoomRepository;
 import lombok.AllArgsConstructor;
@@ -24,6 +25,8 @@ public class MessageService {
 
     private final MessageRepository repository;
     private final RoomRepository roomRepository;
+    private final AttachmentRepository attachmentRepository;
+    private final RoomService roomService;
     private final SimpMessagingTemplate messagingTemplate;
 
     public List<Message> getAllMessages() {
@@ -62,9 +65,12 @@ public class MessageService {
         return message;
     }
 
-    public List<UserMessage> getAllMessagesOfRoom(long roomId) {
-        var room = roomRepository.getReferenceById(roomId);
-        return repository.findAllByChat(room);
+    public List<Message> getAllMessagesOfRoom(long roomId, Customer user) {
+        var chat = roomService.getOneRoom(roomId);
+        var attachment = chat.getAttachment(user);
+        attachment.updateLastRead();
+        attachmentRepository.save(attachment);
+        return repository.findAllByChat(chat);
     }
 
     public void deleteOneMessage(long id) {

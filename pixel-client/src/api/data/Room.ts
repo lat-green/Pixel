@@ -26,8 +26,13 @@ export type Room = GroupRoom | ChannelRoom | ContactRoom
 export type UserRoleAttachmentType = 'group' | 'channel' | 'contact'
 
 interface UserRoleAttachmentRaw {
+    id: number,
     user: number,
-    type: UserRoleAttachmentType
+    chat: number,
+
+    type: UserRoleAttachmentType,
+
+    lastRead: Date
 }
 
 export enum UserGroupRoleAttachmentRole {
@@ -67,7 +72,7 @@ export async function getOneRoom(roomId: number): Promise<Room> {
 }
 
 export async function getRoomUsers(roomId: number): Promise<UserRoleAttachment[]> {
-    return sfetch(`${CHAT_URI}/rooms/${roomId}/users`).then(resp => resp.json());
+    return sfetch(`${CHAT_URI}/rooms/${roomId}/users`).then(resp => resp.json()).then(toAttachmentEach);
 }
 
 export async function getAllRooms(): Promise<Room[]> {
@@ -90,4 +95,22 @@ export async function joinRoom(chatId: number) {
 
 export async function leaveRoom(chatId: number) {
     return sfetch(`${CHAT_URI}/rooms/${chatId}/leave`);
+}
+
+export async function updateLastRead(chatId: number) {
+    return sfetch(`${CHAT_URI}/rooms/${chatId}/read`).then(resp => resp.json()).then(toAttachment);
+}
+
+
+export function toAttachment(message: any): UserRoleAttachment {
+    const copy = Object.assign({}, message);
+    copy.lastRead = new Date(copy.lastRead)
+    return copy as UserRoleAttachment
+}
+
+export function toAttachmentEach(attachments: any[]): UserRoleAttachment[] {
+    let result: UserRoleAttachment[] = []
+    for (const attachment of attachments)
+        result.push(toAttachment(attachment))
+    return result
 }

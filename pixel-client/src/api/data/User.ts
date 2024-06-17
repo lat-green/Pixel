@@ -1,4 +1,5 @@
 import {CHAT_URI, ffetch, sfetch} from "../FetchUtil";
+import {toAttachmentEach} from "./Room";
 
 export interface User {
     id: number,
@@ -17,6 +18,10 @@ export async function getMeUser(): Promise<User> {
 
 export async function getMeChats(): Promise<number[]> {
     return sfetch(`${CHAT_URI}/users/me/chats`).then(resp => resp.json());
+}
+
+export async function getMeAttachments() {
+    return sfetch(`${CHAT_URI}/users/me/attachments`).then(resp => resp.json()).then(toAttachmentEach);
 }
 
 export async function getOneUser(id: number): Promise<User> {

@@ -90,4 +90,9 @@ public class RoomController {
         return roomService.createGroupRoom(user, request);
     }
 
+
+    @GetMapping("/{id}/read")
+    public ChatAttachment updateLastRead(@PathVariable long id, Customer user) {
+        return roomService.updateLastRead(id, user);
+    }
 }

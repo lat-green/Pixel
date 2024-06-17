@@ -31,7 +31,7 @@ public class ChannelAttachment extends ChatAttachment {
     private ChatChannelRole role;
 
     @Override
-    public ChatChannel getChatRoom() {
+    public ChatChannel getChat() {
         return channel;
     }
 

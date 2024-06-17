@@ -1,17 +1,20 @@
 package com.example.pixel.server.chat.controller;
 
 import com.example.pixel.server.chat.controller.securiry.HasScopeProfileRead;
-import com.example.pixel.server.chat.controller.securiry.HasScopeProfileWrite;
-import com.example.pixel.server.chat.dto.user.CustomerReplaceRequest;
 import com.example.pixel.server.chat.entity.Customer;
+import com.example.pixel.server.chat.entity.attachment.ChatAttachment;
 import com.example.pixel.server.chat.serializer.ChatUserAttachmentToUserSerializer;
 import com.example.pixel.server.chat.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -35,7 +38,13 @@ public class UserController {
     @HasScopeProfileRead
     @GetMapping("/me/chats")
     public String getMeChats(Customer user) throws JsonProcessingException {
-        return objectMapper.writeValueAsString(user.getChats().stream().map(attachment -> attachment.getChatRoom().getId()).toList());
+        return objectMapper.writeValueAsString(user.getChats().stream().map(attachment -> attachment.getChat().getId()).toList());
+    }
+
+    @HasScopeProfileRead
+    @GetMapping("/me/attachments")
+    public List<ChatAttachment> getMeAttachments(Customer user) throws JsonProcessingException {
+        return user.getChats();
     }
 
     @GetMapping("/{id}")
@@ -47,6 +56,5 @@ public class UserController {
     public Collection<Customer> getAllUsers() {
         return userService.getAllUsers();
     }
-
 
 }

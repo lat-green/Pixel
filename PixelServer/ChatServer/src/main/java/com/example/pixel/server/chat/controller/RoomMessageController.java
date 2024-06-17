@@ -39,7 +39,7 @@ public class RoomMessageController {
         var room = roomService.getOneRoom(roomId);
         if (!room.getUserRole(user).canRead)
             throw new ForbiddenException("to get messages of chat you will be customer of it's chat");
-        return messageService.getAllMessagesOfRoom(roomId);
+        return messageService.getAllMessagesOfRoom(roomId, user);
     }
 
 }
