@@ -65,7 +65,7 @@ public class MessageService {
         return message;
     }
 
-    public List<Message> getAllMessagesOfRoom(long roomId, Customer user) {
+    public List<? extends Message> getAllMessagesOfRoom(long roomId, Customer user) {
         var chat = roomService.getOneRoom(roomId);
         var attachment = chat.getAttachment(user);
         attachment.updateLastRead();

@@ -8,3 +8,4 @@
 /PixelServer/auth-service
 /PixelServer/chat-service
 /PixelServer/ChatServer/uploaded
+**/.sonarlint
