@@ -9,6 +9,10 @@ on:
         branches:
             - '*'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+
 jobs:
   build:
     runs-on: self-hosted
@@ -18,8 +22,12 @@ jobs:
     - name: Maven Verify
       run: mvn -B clean verify -f PixelServer
 
-    - name: Test Coverage
-      uses: codecov/codecov-action@v3
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
+  codecov:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Test Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
