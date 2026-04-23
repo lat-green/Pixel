@@ -29,7 +29,7 @@
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
     "react-drag-drop-files": "^2.3.10",
-    "react-native": "^0.74.1",
+    "react-native": "^0.85.2",
     "react-oauth2-code-pkce": "^1.18.1",
     "react-scripts": "^5.0.1",
     "react-scroll-to-bottom": "^4.2.0",
